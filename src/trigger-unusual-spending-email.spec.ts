@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { createPayment } from "./spec-helpers";
+import { Calendar } from "./infrastructure/calendar";
 import {
-  ICalendar,
   IEmailService,
   IPaymentsApi,
   triggerUnusualSpendingEmail,
@@ -13,16 +13,7 @@ describe("triggerUnusualSpendingEmail", () => {
     const month = 10;
     const customerId = "customer-123";
 
-    const calendar: ICalendar = {
-      getCurrentMonthAndYear: () => ({
-        month,
-        year,
-      }),
-      getPreviousMonthAndYear: () => ({
-        month: month - 1,
-        year,
-      }),
-    };
+    const calendar = Calendar.createNull({ month, year });
     const paymentsApi: IPaymentsApi = {
       fetchUserPaymentsByMonth: vi.fn(),
     };
