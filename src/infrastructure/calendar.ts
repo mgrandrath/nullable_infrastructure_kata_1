@@ -11,16 +11,16 @@ export class Calendar implements ICalendar {
   }
 
   constructor(
-    private createDate: () => Pick<Date, "getMonth" | "getFullYear">
+    private _createDate: () => Pick<Date, "getMonth" | "getFullYear">
   ) {}
 
   getCurrentMonthAndYear() {
-    const date = this.createDate();
+    const date = this._createDate();
     return { month: date.getMonth() + 1, year: date.getFullYear() };
   }
 
   getPreviousMonthAndYear() {
-    const date = this.createDate();
+    const date = this._createDate();
     const month = date.getMonth() + 1;
     const year = date.getFullYear();
 
