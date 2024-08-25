@@ -1,0 +1,12 @@
+{
+  "payments": [
+    {
+      "id": "1",
+      "customerId": "customer-123",
+      "month": "2024-08",
+      "price": 123,
+      "description": "Foo",
+      "category": "Bar"
+    }
+  ]
+}

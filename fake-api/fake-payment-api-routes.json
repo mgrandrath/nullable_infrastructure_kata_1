@@ -1,0 +1,3 @@
+{
+  "/payments-by-month/:customerId/:yearAndMonth": "/customers/:customerId/payments?month=:yearAndMonth"
+}
