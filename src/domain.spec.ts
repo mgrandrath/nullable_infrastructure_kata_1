@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { Payment, UnusualSpending } from "./types";
 import {
   detectUnusualSpending,
   groupPaymentsByCategory,
+  Payment,
+  UnusualSpending,
   unusualSpendingToEmailMessage,
 } from "./domain";
 import { createPayment } from "./spec-helpers";
