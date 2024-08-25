@@ -1,14 +1,16 @@
 import { describe, expect, it, vi } from "vitest";
 import { HttpClient } from "./http-client";
-import { CustomerId } from "../domain";
+import { CustomerId, Month, Year } from "../domain";
 import { captureEvents, createPayment } from "../spec-helpers";
 import { PaymentApi, PaymentApiError } from "./payment-api";
 
 describe("PaymentApi", () => {
-  it("should fetch the list of payments for a given customer id", async () => {
+  it("should fetch the list of payments for a given customer id and month", async () => {
     const customerId: CustomerId = "customer-123";
+    const year: Year = 2024;
+    const month: Month = 5;
     const httpClient = HttpClient.createNull({
-      "/payments/customer-123": {
+      "/payments-by-month/customer-123/2024-05": {
         status: 200,
         headers: {
           "content-type": "application/json; charset=utf-8",
@@ -37,33 +39,37 @@ describe("PaymentApi", () => {
       httpClient
     );
 
-    const payments = await paymentApi.fetchPaymentsForCustomer(customerId);
+    const payments = await paymentApi.fetchUserPaymentsByMonth(
+      customerId,
+      year,
+      month
+    );
 
-    expect(payments).toEqual({
-      data: [
-        createPayment({
-          price: 10.99,
-          category: "electronics",
-          description: "Smartphone",
-        }),
-        createPayment({
-          price: 29.99,
-          category: "home",
-          description: "Cushion",
-        }),
-        createPayment({
-          price: 5.99,
-          category: "books",
-          description: "Novel",
-        }),
-      ],
-    });
+    expect(payments).toEqual([
+      createPayment({
+        price: 10.99,
+        category: "electronics",
+        description: "Smartphone",
+      }),
+      createPayment({
+        price: 29.99,
+        category: "home",
+        description: "Cushion",
+      }),
+      createPayment({
+        price: 5.99,
+        category: "books",
+        description: "Novel",
+      }),
+    ]);
   });
 
-  it("should send requests to the configured url", async () => {
+  it("should send requests to the correct configured url", async () => {
     const customerId: CustomerId = "customer-123";
+    const year: Year = 2024;
+    const month: Month = 12;
     const httpClient = HttpClient.createNull({
-      "/my-api/payments/customer-123": {
+      "/my-api/payments-by-month/customer-123/2024-12": {
         body: "[]",
       },
     });
@@ -73,19 +79,21 @@ describe("PaymentApi", () => {
     );
     const events = captureEvents(httpClient.events, "requestSent");
 
-    await paymentApi.fetchPaymentsForCustomer(customerId);
+    await paymentApi.fetchUserPaymentsByMonth(customerId, year, month);
 
     expect(events.data()).toEqual([
       expect.objectContaining({
         request: {
           method: "GET",
-          url: new URL("https://api.example.com/my-api/payments/customer-123"),
+          url: new URL(
+            "https://api.example.com/my-api/payments-by-month/customer-123/2024-12"
+          ),
         },
       }),
     ]);
   });
 
-  it("should throw a PaymentApiError if the server responds unexpectedly", async () => {
+  it("should throw a PaymentApiError if the server responds with unexpected data", async () => {
     const httpClient = HttpClient.createNull({
       "*": {
         body: JSON.stringify({
@@ -101,7 +109,7 @@ describe("PaymentApi", () => {
     );
 
     await expect(() =>
-      paymentApi.fetchPaymentsForCustomer("customer-123")
+      paymentApi.fetchUserPaymentsByMonth("customer-123", 2020, 2)
     ).rejects.toThrow(PaymentApiError);
   });
 
@@ -110,9 +118,11 @@ describe("PaymentApi", () => {
       vi.spyOn(globalThis, "fetch");
       const paymentApi = PaymentApi.createNull();
 
-      await paymentApi.fetchPaymentsForCustomer("irrelevant-id").catch(() => {
-        // discard errors
-      });
+      await paymentApi
+        .fetchUserPaymentsByMonth("irrelevant-id", 2010, 1)
+        .catch(() => {
+          // discard connection errors
+        });
 
       expect(fetch).not.toHaveBeenCalled();
     });
@@ -120,16 +130,18 @@ describe("PaymentApi", () => {
     it("should return an empty list of payments by default", async () => {
       const paymentApi = PaymentApi.createNull();
 
-      const payments = await paymentApi.fetchPaymentsForCustomer(
-        "irrelevant-id"
+      const payments = await paymentApi.fetchUserPaymentsByMonth(
+        "irrelevant-id",
+        2010,
+        1
       );
 
-      expect(payments.data).toEqual([]);
+      expect(payments).toEqual([]);
     });
 
     it("should return a configurable list of payments", async () => {
       const paymentApi = PaymentApi.createNull({
-        "customer-123": [
+        "customer-123/2024-09": [
           createPayment({
             price: 10.99,
             category: "groceries",
@@ -138,11 +150,13 @@ describe("PaymentApi", () => {
         ],
       });
 
-      const payments = await paymentApi.fetchPaymentsForCustomer(
-        "customer-123"
+      const payments = await paymentApi.fetchUserPaymentsByMonth(
+        "customer-123",
+        2024,
+        9
       );
 
-      expect(payments.data).toEqual([
+      expect(payments).toEqual([
         createPayment({
           price: 10.99,
           category: "groceries",

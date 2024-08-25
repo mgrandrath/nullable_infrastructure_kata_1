@@ -1,9 +1,10 @@
 import z from "zod";
-import { CustomerId, Payment } from "../domain";
+import { CustomerId, Month, Payment, Year } from "../domain";
 import {
   HttpClient,
   NullConfiguration as HttpClientNullConfiguration,
 } from "./http-client";
+import { IPaymentsApi } from "../trigger-unusual-spending-email";
 
 const ResponseSchema = z.array(
   z.object({
@@ -21,7 +22,7 @@ export type NullConfiguration = Record<CustomerId, Payment[]>;
 
 export class PaymentApiError extends Error {}
 
-export class PaymentApi {
+export class PaymentApi implements IPaymentsApi {
   static createNull(nullConfiguration?: NullConfiguration) {
     return new PaymentApi(
       { baseUrl: new URL("https://example.com") },
@@ -38,18 +39,26 @@ export class PaymentApi {
     private _httpClient: HttpClient
   ) {}
 
-  async fetchPaymentsForCustomer(customerId: CustomerId) {
-    const result = await this._httpClient.sendRequest({
+  async fetchUserPaymentsByMonth(
+    customerId: CustomerId,
+    year: Year,
+    month: Month
+  ) {
+    const response = await this._httpClient.sendRequest({
       method: "GET",
-      url: new URL(`payments/${customerId}`, this._configuration.baseUrl),
+      url: new URL(
+        `payments-by-month/${customerId}/${year}-${month
+          .toString()
+          .padStart(2, "0")}`,
+        this._configuration.baseUrl
+      ),
     });
 
     try {
-      const data = ResponseSchema.parse(JSON.parse(result.body));
-      return { data };
+      return ResponseSchema.parse(JSON.parse(response.body));
     } catch (error) {
       throw new PaymentApiError(
-        `Failed to fetch payments for customer "${customerId}": Unexpected response from server`,
+        `Failed to fetch payments for customer "${customerId}": Invalid response from server`,
         {
           cause: error,
         }
@@ -62,13 +71,24 @@ const convertNullConfiguration = (
   nullConfiguration: NullConfiguration = {}
 ): HttpClientNullConfiguration => {
   const responses = Object.fromEntries(
-    Object.entries(nullConfiguration).map(([customerId, payments]) => [
-      `/payments/${customerId}`,
-      {
-        status: 200,
-        body: JSON.stringify(payments),
-      },
-    ])
+    Object.entries(nullConfiguration).map(([idAndMonth, payments]) => {
+      const match = /^(.*)\/(\d{4})-(\d{1,2})$/.exec(idAndMonth);
+      if (!match) {
+        throw new Error(
+          `Invalid format. Expected "<customerId>/<year>-<month>" (ex. "customer-123/2020-05") but got "${idAndMonth}"`
+        );
+      }
+      const [_, customerId, year, month] = match;
+      return [
+        `/payments-by-month/${customerId}/${year}-${month
+          ?.toString()
+          .padStart(2, "0")}`,
+        {
+          status: 200,
+          body: JSON.stringify(payments),
+        },
+      ];
+    })
   );
   const defaultResponse = {
     status: 200,
