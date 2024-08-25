@@ -113,6 +113,48 @@ describe("PaymentApi", () => {
     ).rejects.toThrow(PaymentApiError);
   });
 
+  it("should ignore additional properties", async () => {
+    const customerId: CustomerId = "customer-123";
+    const year: Year = 2024;
+    const month: Month = 5;
+    const httpClient = HttpClient.createNull({
+      "*": {
+        status: 200,
+        headers: {
+          "content-type": "application/json; charset=utf-8",
+        },
+        body: JSON.stringify([
+          {
+            ...createPayment({
+              price: 10.99,
+              category: "electronics",
+              description: "Smartphone",
+            }),
+            someExtraProperty: "does not matter",
+          },
+        ]),
+      },
+    });
+    const paymentApi = new PaymentApi(
+      { baseUrl: new URL("https://irrelevant.example.com") },
+      httpClient
+    );
+
+    const payments = await paymentApi.fetchUserPaymentsByMonth(
+      customerId,
+      year,
+      month
+    );
+
+    expect(payments).toEqual([
+      createPayment({
+        price: 10.99,
+        category: "electronics",
+        description: "Smartphone",
+      }),
+    ]);
+  });
+
   describe("null instance", () => {
     it("should not send actual requests", async () => {
       vi.spyOn(globalThis, "fetch");
