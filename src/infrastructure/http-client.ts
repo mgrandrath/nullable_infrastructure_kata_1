@@ -28,13 +28,13 @@ export type HttpClientEventMap = {
   requestSent: [{ request: HttpClientRequest; response: HttpClientResponse }];
 };
 
-type Fetch = typeof fetch;
+type Fetch = typeof globalThis.fetch;
 
 export class HttpClient {
   events = new EventEmitter<HttpClientEventMap>();
 
   static create() {
-    return new HttpClient(fetch);
+    return new HttpClient(globalThis.fetch);
   }
 
   static createNull(nullConfiguration?: NullConfiguration) {
