@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { EmailClient } from "./email-client";
+import { SmtpClient } from "./smtp-client";
 import { EmailService } from "./email-service";
 import { captureEvents } from "../spec-helpers";
 
 describe("EmailService", () => {
   it("should send an email to a given customer", async () => {
-    const emailClient = EmailClient.createNull();
+    const smtpClient = SmtpClient.createNull();
     const emailService = new EmailService(
       {
         smtpServer: {
@@ -14,9 +14,9 @@ describe("EmailService", () => {
         },
         senderAddress: "unusual-spending@service.my-bank.com",
       },
-      emailClient
+      smtpClient
     );
-    const events = captureEvents(emailClient.events, "emailSent");
+    const events = captureEvents(smtpClient.events, "emailSent");
 
     await emailService.sendEmailToCustomer(
       "customer-123",
@@ -41,7 +41,7 @@ describe("EmailService", () => {
   });
 
   it("should emit an event whenever an email has been sent to a customer", async () => {
-    const emailClient = EmailClient.createNull();
+    const smtpClient = SmtpClient.createNull();
     const emailService = new EmailService(
       {
         smtpServer: {
@@ -50,7 +50,7 @@ describe("EmailService", () => {
         },
         senderAddress: "unusual-spending@service.my-bank.com",
       },
-      emailClient
+      smtpClient
     );
     const events = captureEvents(emailService.events, "emailSentToCustomer");
 
@@ -71,7 +71,7 @@ describe("EmailService", () => {
 
   it("should not emit an event sending the email failed", async () => {
     const expectedError = new Error("Send failed");
-    const emailClient = EmailClient.createNull({
+    const smtpClient = SmtpClient.createNull({
       errorOnSend: expectedError,
     });
     const emailService = new EmailService(
@@ -82,7 +82,7 @@ describe("EmailService", () => {
         },
         senderAddress: "irrelevant@service.my-bank.com",
       },
-      emailClient
+      smtpClient
     );
     const events = captureEvents(emailService.events, "emailSentToCustomer");
 

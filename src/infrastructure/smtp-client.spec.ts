@@ -1,10 +1,10 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { SMTPServer } from "smtp-server";
 import { simpleParser as parseEmailStream } from "mailparser";
-import { EmailClient } from "./email-client";
+import { SmtpClient } from "./smtp-client";
 import { captureEvents } from "../spec-helpers";
 
-describe("EmailClient", () => {
+describe("SmtpClient", () => {
   let testServer: TestServer;
 
   beforeAll(async () => {
@@ -23,9 +23,9 @@ describe("EmailClient", () => {
   });
 
   it("should send an email for real", async () => {
-    const emailClient = EmailClient.create();
+    const smtpClient = SmtpClient.create();
 
-    await emailClient.sendEmail(
+    await smtpClient.sendEmail(
       {
         host: "localhost",
         port: testServer.port(),
@@ -47,10 +47,10 @@ describe("EmailClient", () => {
   });
 
   it("should emit an event whenever an email has been sent", async () => {
-    const emailClient = EmailClient.create();
-    const events = captureEvents(emailClient.events, "emailSent");
+    const smtpClient = SmtpClient.create();
+    const events = captureEvents(smtpClient.events, "emailSent");
 
-    await emailClient.sendEmail(
+    await smtpClient.sendEmail(
       {
         host: "localhost",
         port: testServer.port(),
@@ -82,12 +82,12 @@ describe("EmailClient", () => {
   describe("null instance", () => {
     it("fails with a configurable error", async () => {
       const expectedError = new Error("Sending failed");
-      const emailClient = EmailClient.createNull({
+      const smtpClient = SmtpClient.createNull({
         errorOnSend: expectedError,
       });
 
       await expect(
-        emailClient.sendEmail(
+        smtpClient.sendEmail(
           {
             host: "irrelevant.example.org",
             port: 123,
@@ -104,12 +104,12 @@ describe("EmailClient", () => {
 
     it("does not emit an event when sending the email failed", async () => {
       const expectedError = new Error("Sending failed");
-      const emailClient = EmailClient.createNull({
+      const smtpClient = SmtpClient.createNull({
         errorOnSend: expectedError,
       });
-      const events = captureEvents(emailClient.events, "emailSent");
+      const events = captureEvents(smtpClient.events, "emailSent");
 
-      await emailClient
+      await smtpClient
         .sendEmail(
           {
             host: "irrelevant.example.org",

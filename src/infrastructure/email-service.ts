@@ -1,7 +1,7 @@
 import EventEmitter from "events";
 import { CustomerId } from "../domain";
 import { IEmailService } from "../trigger-unusual-spending-email";
-import { EmailClient, SmtpServerAddress } from "./email-client";
+import { SmtpClient, SmtpServerAddress } from "./smtp-client";
 
 export type EmailServiceConfiguration = {
   smtpServer: SmtpServerAddress;
@@ -29,16 +29,16 @@ export class EmailService implements IEmailService {
       },
       senderAddress: "null-sender@example.org",
     };
-    return new EmailService(configuration, EmailClient.createNull());
+    return new EmailService(configuration, SmtpClient.createNull());
   }
 
   static create(configuration: EmailServiceConfiguration) {
-    return new EmailService(configuration, EmailClient.create());
+    return new EmailService(configuration, SmtpClient.create());
   }
 
   constructor(
     private _configuration: EmailServiceConfiguration,
-    private _emailClient: EmailClient
+    private _smtpClient: SmtpClient
   ) {}
 
   async sendEmailToCustomer(
@@ -46,7 +46,7 @@ export class EmailService implements IEmailService {
     subject: string,
     body: string
   ) {
-    await this._emailClient.sendEmail(this._configuration.smtpServer, {
+    await this._smtpClient.sendEmail(this._configuration.smtpServer, {
       from: this._configuration.senderAddress,
       to: `${customerId}@customer.my-bank.com`,
       subject,

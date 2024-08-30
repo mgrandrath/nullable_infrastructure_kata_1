@@ -19,22 +19,22 @@ export type NullConfiguration = {
   errorOnSend?: SMTPError;
 };
 
-export type EmailClientEventMap = {
+export type SmtpClientEventMap = {
   emailSent: [{ smtpServer: SmtpServerAddress; email: Email }];
 };
 
 type Connection = Pick<SMTPConnection, "connect" | "send" | "close">;
 type ConnectionFactory = (smtpServerAdress: SmtpServerAddress) => Connection;
 
-export class EmailClient {
-  events = new EventEmitter<EmailClientEventMap>();
+export class SmtpClient {
+  events = new EventEmitter<SmtpClientEventMap>();
 
   static createNull(nullConfiguration?: NullConfiguration) {
-    return new EmailClient(createNullConnection(nullConfiguration));
+    return new SmtpClient(createNullConnection(nullConfiguration));
   }
 
   static create() {
-    return new EmailClient(createRealConnection());
+    return new SmtpClient(createRealConnection());
   }
 
   constructor(private _createConnection: ConnectionFactory) {}
