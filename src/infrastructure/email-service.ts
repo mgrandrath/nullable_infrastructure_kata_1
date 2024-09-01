@@ -21,6 +21,10 @@ export type EmailServiceEventMap = {
 export class EmailService implements IEmailService {
   events = new EventEmitter<EmailServiceEventMap>();
 
+  static create(configuration: EmailServiceConfiguration) {
+    return new EmailService(configuration, SmtpClient.create());
+  }
+
   static createNull() {
     const configuration: EmailServiceConfiguration = {
       smtpServer: {
@@ -30,10 +34,6 @@ export class EmailService implements IEmailService {
       senderAddress: "null-sender@example.org",
     };
     return new EmailService(configuration, SmtpClient.createNull());
-  }
-
-  static create(configuration: EmailServiceConfiguration) {
-    return new EmailService(configuration, SmtpClient.create());
   }
 
   constructor(

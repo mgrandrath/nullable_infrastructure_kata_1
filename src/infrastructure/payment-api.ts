@@ -23,15 +23,15 @@ export type NullConfiguration = Record<CustomerId, Payment[]>;
 export class PaymentApiError extends Error {}
 
 export class PaymentApi implements IPaymentsApi {
+  static create(configuration: PaymentApiConfiguration) {
+    return new PaymentApi(configuration, HttpClient.create());
+  }
+
   static createNull(nullConfiguration?: NullConfiguration) {
     return new PaymentApi(
       { baseUrl: new URL("https://example.com") },
       HttpClient.createNull(convertNullConfiguration(nullConfiguration))
     );
-  }
-
-  static create(configuration: PaymentApiConfiguration) {
-    return new PaymentApi(configuration, HttpClient.create());
   }
 
   constructor(

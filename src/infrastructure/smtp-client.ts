@@ -29,12 +29,12 @@ type ConnectionFactory = (smtpServerAdress: SmtpServerAddress) => Connection;
 export class SmtpClient {
   events = new EventEmitter<SmtpClientEventMap>();
 
-  static createNull(nullConfiguration?: NullConfiguration) {
-    return new SmtpClient(createNullConnection(nullConfiguration));
-  }
-
   static create() {
     return new SmtpClient(createRealConnection());
+  }
+
+  static createNull(nullConfiguration?: NullConfiguration) {
+    return new SmtpClient(createNullConnection(nullConfiguration));
   }
 
   constructor(private _createConnection: ConnectionFactory) {}
