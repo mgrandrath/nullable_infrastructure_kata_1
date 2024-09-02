@@ -32,8 +32,8 @@ perfect fit.
 
 ## The "Unusual Spending" kata
 
-The task of the Unusual Spending kata is to implement a system that (given a
-customer ID) fetches two lists of payments a single customer made. One of the
+The objective of the Unusual Spending kata is to implement a system that (given
+a customer ID) fetches two lists of payments a single customer made. One of the
 current month and one of the previous month. In both lists the payment amounts
 have to be summed up by payment category. If there is an increase of more than
 50% in a category from the previous month to the current month then this is
@@ -42,14 +42,56 @@ the system should send an email to the customer in question, informing them
 about the potential issue.
 
 The pure domain logic in this case is the code that sums up the amounts by
-category and compares them. The infrastructure consists of a calendar (to read
-the current month), an API to load the lists of payments, and an email service
-that can send an email by talking to an SMTP server. Notice that the UI part is
-out of the scope of this kata.
+category and compares them. The infrastructure consists of a calendar (to get
+the current date), an API to load the lists of payments, and an email service
+that can send an email by talking to an SMTP server. The UI part is out of the
+scope of this kata. All infrastructure classes implement an interface (or port)
+that is defined by the domain. This architecture prevents the domain code from
+depending on implementation details and also makes it easier to test.
 
-[![Hexagon](./hexagon.png)](https://viewer.diagrams.net/?tags=%7B%7D&lightbox=1&highlight=0000ff&edit=_blank&layers=1&nav=1&title=Unusual%20Spending%20Hexagon.drawio#R%3Cmxfile%3E%3Cdiagram%20name%3D%22Page-1%22%20id%3D%22TCG4UKSa01HB5v_6KEIQ%22%3E7VfbbpwwEP0aHlNx3ctjs2zTSqmCtIqaPlrLBFwBRl6zQL%2B%2B9jIGXNpNmouWhz7hOR5f5pwZBixvkzc3nJTpVxZDZrl23FheaLmu43u%2BfCik7ZDlatUBCacxOg3Ajv4EBG1EKxrDwXAUjGWClia4Z0UBe2FghHNWm26PLDNPLUkCE2C3J9kU%2FUZjkXboKrAH%2FDPQJNUnOzbO5EQ7I3BISczqEeRtLW%2FDGRPdKG82kCnyNC%2Fduk9%2Fme0vxqEQz1lwtY7q6D6s7m6b7I6JNvRbcrXEu4lWBwyxjB9NxkXKElaQbDug15xVRQxqV1tag88tY6UEHQn%2BACFaFJNUgkkoFXmGs9BQ8TAaf1dbfVgGaIYNbn0yWjSm4SIDB1bxPZyJUacN4QmIM36YqYqA0QFI5g2wHARvpQOHjAh6NBOEYJ4lvd8ghRygGv%2BgzOoiyhTy6g%2BafmV02gTaHLQ5We1IqRkqGsxK0fV%2FRV%2Bt6GJWiuK%2BR5JVeFLIckKLidDy3V%2BqYQoNkfpJqkrgVF4C%2BIBGGpIBXdcpFbAryYm1WvZWU9ZH2oDulso%2BdMPgrApH4AKas7zhrKu7mO7aaNZDC%2Bxd0lH768E3p9qbU%2FG4T1XPywvBfWYhOLMqBHdSCPdfJoKZcjyR4G%2BQxL6Zw%2F40hx33Dzm8eK8U9ickbeRnZhETfnmqliZXTnBpsoIJWRFpcxWha3%2BMZpBcvzHWf%2BZfjLHFhLGt7EVq2Q74kUoqZsfZ%2Bv04k%2Bbwa3WaG%2F2gettf%3C%2Fdiagram%3E%3C%2Fmxfile%3E)
+[![Hexagon](./hexagon.png)](https://viewer.diagrams.net/?tags=%7B%7D&lightbox=1&highlight=0000ff&edit=_blank&layers=1&nav=1&title=Unusual%20Spending%20Hexagon.drawio#R%3Cmxfile%3E%3Cdiagram%20name%3D%22Page-1%22%20id%3D%22TCG4UKSa01HB5v_6KEIQ%22%3E3Zjvc5owHIf%2FGl%2B644egvqxi293s5M71ur7a5eBbyA4IF4PC%2FvolJQgYWt1Ni9dXJp8kkjx5wODAnMf5HUVp%2BEB8iAaG5ucD0xkYhq5PLf4hkqJMbGtcBgHFvuxUB2v8B2SoyTTDPmxaHRkhEcNpO%2FRIkoDHWhmilOza3V5I1L5qigJQgrWHIjV9wj4Ly3RiaXV%2BDzgIqyvrmmyJUdVZBpsQ%2BWTXiMzFwJxTQlhZivM5RAJexaUcd%2FtG635iFBJ2yoDh1N25j062WubRirDCGRVoKL9li6JMLlhOlhUVAT7vVBRDyFFAkoE5S4HiGBjQOnWriC9rtgsxg3WKPDFsx73gWcjiiNd0XnzBOVQ7LeqbssiRmjN1UdUMgTLIG5Fc5B0Qfl1a8C6y1ah2QBo3ltVdvX37LmFz6yYyRFKZYP%2FVNVVekGC7IX%2F%2F9e3H%2FXK7BmO1en5ybzfTB3s4VZhSkiU%2BiDFi0YSykHCIKFoSkkoqv4GxQlJCGSNthhwPLX7K8a%2BVZ1H5YlhV3cmbrU4ha%2BVUwFesV4hvSEY9eMcdqQpDNAB2zDF1uyhEiOFtex7%2Fw%2F69STYEf%2Fx6ZDuO6HsGRUdtQ0eqobrRYah9KUHtCwqqtwX9QD9Hqp%2Bdq%2B%2FVz5Hi55z%2F9iQ%2Bov1bOm5rqlt9ezr%2BlJ5aJ3pq9OmppXjqoiIWazW0G%2FcKHqkHz9T9sas3WSefUlb7RFnNPmW1FVkXMcJi2BroFvMF9q7rwSHVmPatq%2FomUP0QudzUcwBT6HQwfBOYeQBMt1Vgkw5exqV4qQdL%2BUC8SfFVENvjqIhNVGLTjyRmdt%2BV8pa8Dmb2wW2pddyWXS%2BPF4Omng8dwqklCiq%2BaNbmgSIc8Nd1x%2BOLF%2B%2FqM4EGeyi6kQ0x9n0xvBNsG%2F052B4eJ3WVrd2B1vx3tLxa%2F6%2Fy2tb4d8pc%2FAU%3D%3C%2Fdiagram%3E%3C%2Fmxfile%3E)
 
 ## The Nullable Infrastructure implementation
+
+When testing the domain code that interacts with the infrastructure we want to
+avoid triggering side effects for a couple of reasons. Side effects make our
+tests slow because they have to wait for file or even network I/O. Our tests
+become harder to set up because we have to take care of external dependencies
+like files, APIs or databases. Also, our tests become dependent on this external
+state as well. Whether they succeed or fail depends on the state these other
+systems are in.
+
+This is the reason why we implement our domain logic so that we can pass the
+infrastructure implementations in. This pattern is called "dependency injection"
+(TODO link) because we pass in (or "inject") the dependencies our code needs. It
+enables us to pass in versions of the infrastructure interfaces that we have
+full control over and that we can configure to behave exactly the way we need
+them to in each individual test.
+
+One popular approach to provide such controlled infrastructure objects is to use
+so-called "mock objects" or "mocks". These are objects that implement the same
+interfaces as our infrastructure but are completely separate from our own
+implementations. They are usually created using a mocking library or framework
+that given an interface creates a matching mock object. The primary downside of
+this approach is that tests using mocks focus on testing the interactions
+between the tested code and the injected dependency instead of the resulting
+behavior. In general this leads to tests that are tightly coupled to
+implementation internals and that tend to hinder refactoring.
+
+The second approach is to use "fakes". These are implementations of our
+infrastructure interfaces that are specifically designed to be used inside
+tests. For example we might use an in-memory database implementation instead of
+the real one. Unless we already have such implementations for other reasons
+anyway this strategy causes a sigificant amount of maintenance effort. Also, the
+behavior of the fake implementation needs to match the real one very closely.
+
+Nullables offer a third option to this problem. As described above Nullable
+objects provide an "off switch" that allows us to use the actual and real
+implementation but with its side effect short-circuited. This keeps our tests
+fast and independent of external state. It also avoids the need for third party
+mocking frameworks that can get quite complex. Additionally it results in stable
+tests that don't break easily when the code is refactored. This encourages
+evolutionary design (TODO link).
 
 It demonstrates the use of
 
