@@ -11,6 +11,13 @@ describe("Calendar", () => {
   });
 
   it("should return the current month and year", () => {
+    // In order to test the real Calendar implementation we need to fool it and
+    // take control of the system's date/time. We try to limit the number of
+    // tests that need to do this to the absolute minimum. The reason for this
+    // is that the fake timer setup is quite complex and error prone. Notice for
+    // example that we need to remember to call `useRealTimers` after the tests.
+    // In contrast the configuration of our Null implementation (see below) is
+    // much simpler and can be tailored to our particular use case.
     vi.setSystemTime(new Date("2024-06-01"));
 
     const calendar = Calendar.create();
@@ -45,6 +52,9 @@ describe("Calendar", () => {
 
   describe("null instance", () => {
     it("should return a configured current month", () => {
+      // The configuration object that we pass to `createNull` perfectly matches
+      // the configuration options we actually need. In case we require more
+      // complex options in the future we can add them then.
       const calendar = Calendar.createNull({ month: 12, year: 2018 });
 
       expect(calendar.getCurrentMonthAndYear()).toEqual({
