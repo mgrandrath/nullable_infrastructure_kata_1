@@ -51,6 +51,31 @@ describe("Calendar", () => {
   });
 
   describe("null instance", () => {
+    it("should return a default current month", () => {
+      // We always want to be able to create functional Null instances without
+      // being forced to pass in a configuration object. This is called
+      // Parameterless Instantiation[^1] and comes in handy when we need a
+      // calendar object inside a test that does not care about the specific
+      // date it returns.
+      //
+      // [^1] TODO link
+      const calendar = Calendar.createNull();
+
+      expect(calendar.getCurrentMonthAndYear()).toEqual({
+        month: 1,
+        year: 1970,
+      });
+    });
+
+    it("should return a default previous month", () => {
+      const calendar = Calendar.createNull();
+
+      expect(calendar.getPreviousMonthAndYear()).toEqual({
+        month: 12,
+        year: 1969,
+      });
+    });
+
     it("should return a configured current month", () => {
       // The configuration object that we pass to `createNull` perfectly matches
       // the configuration options we actually need. In case we require more

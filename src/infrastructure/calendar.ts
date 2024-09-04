@@ -15,7 +15,7 @@ export class Calendar implements ICalendar {
     return new Calendar(() => new Date());
   }
 
-  static createNull(nullConfiguration: NullConfiguration) {
+  static createNull(nullConfiguration?: NullConfiguration) {
     // The `createNull` facory method creates an instance with a configured stub
     // instead of the actual side effect. Notice that we only stub out external
     // code (in this case the `Date` object provided by the JavaScript runtime),
@@ -48,7 +48,9 @@ export class Calendar implements ICalendar {
 // in our use cases. Here, this means just implementing the `getMonth` and
 // `getFullYear` methods. The tight coupling between the `Calendar` class above
 // and this stub is the reason we implement both in the same file.
-const createDateStub = (current: NullConfiguration) => () => ({
-  getMonth: () => current.month - 1,
-  getFullYear: () => current.year,
-});
+const createDateStub =
+  (current: NullConfiguration = { month: 1, year: 1970 }) =>
+  () => ({
+    getMonth: () => current.month - 1,
+    getFullYear: () => current.year,
+  });
