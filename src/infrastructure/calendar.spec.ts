@@ -16,8 +16,8 @@ describe("Calendar", () => {
     // tests that need to do this to the absolute minimum. The reason for this
     // is that the fake timer setup is quite complex and error prone. Notice for
     // example that we need to remember to call `useRealTimers` after the tests.
-    // In contrast the configuration of our Null implementation (see below) is
-    // much simpler and can be tailored to our particular use case.
+    // In contrast configuring and using the Null implementation (see below) is
+    // much simpler and can be tailored to perfectly match our needs.
     vi.setSystemTime(new Date("2024-06-01"));
 
     const calendar = Calendar.create();

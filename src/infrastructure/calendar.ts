@@ -6,12 +6,15 @@ export type NullConfiguration = {
   year: Year;
 };
 
+// We create a subset of the built-in `Date` interface that we actually use in
+// our implementation. This subset can grow over time as needed.
 export type DateFactory = () => Pick<Date, "getMonth" | "getFullYear">;
 
 export class Calendar implements ICalendar {
   static create() {
     // The `create` factory method creates an instance with the real side
-    // effect.
+    // effect. In this case creating `Date` instances that access the global
+    // system state.
     return new Calendar(() => new Date());
   }
 
@@ -26,9 +29,9 @@ export class Calendar implements ICalendar {
   constructor(private _createDate: DateFactory) {}
 
   getCurrentMonthAndYear() {
-    // We use the injected `_createDate` factory without knowing if it is the
-    // real one or the stub. All the code in this method gets executed inside
-    // our tests.
+    // We use the injected `_createDate` factory function without knowing if it
+    // is the real one or the stub. All the code in this method gets executed
+    // inside our tests.
     const date = this._createDate();
     return { month: date.getMonth() + 1, year: date.getFullYear() };
   }
@@ -44,10 +47,11 @@ export class Calendar implements ICalendar {
   }
 }
 
-// We implement only the bare minimum that we need to replace the `Date` class
-// in our use cases. Here, this means just implementing the `getMonth` and
-// `getFullYear` methods. The tight coupling between the `Calendar` class above
-// and this stub is the reason we implement both in the same file.
+// We only implement the bare minimum that we need in order to replace the
+// `Date` class in our use cases. Here, this means we just implement the
+// `getMonth` and `getFullYear` methods. The tight coupling between the
+// `Calendar` class above and this stub is the reason we implement both in the
+// same file.
 const createDateStub =
   (current: NullConfiguration = { month: 1, year: 1970 }) =>
   () => ({
