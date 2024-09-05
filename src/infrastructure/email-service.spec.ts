@@ -9,15 +9,15 @@ describe("EmailService", () => {
     // own tests. Now we can make use of its ability to work without triggering
     // side effects.
     //
-    // Not using a mock object for these kinds of tests results in more stable
-    // tests when it comes to refactoring. We can change the protocol between
-    // `EmailService` and `SmtpClient` at will and this test will continue to
-    // work as long as we don't change the overall behavior. This includes
-    // changes that are not captured by the interface definition. For example,
-    // we could change `EmailService` and `SmtpClient` so that the sender email
-    // address is wrapped in angle brackets (`<`, `>`). The interface would not
-    // change (the address is still a string) but this test would continue to
-    // ensure that both classes work together correctly.
+    // Using a Nullable instead of a mock object for these kinds of tests
+    // results in more stable tests when it comes to refactoring. We can change
+    // the protocol between `EmailService` and `SmtpClient` at will and this
+    // test will continue to work as long as we don't change the overall
+    // behavior. This includes changes that are not captured by the interface
+    // definition. For example, we could change `EmailService` and `SmtpClient`
+    // so that the sender email address is wrapped in angle brackets (`<`, `>`).
+    // The interface would not change (the address is still a string) but this
+    // test would continue to ensure that both classes work together correctly.
     const smtpClient = SmtpClient.createNull();
 
     // Only in tests are we allowed to use the constructor directly. All other
@@ -65,8 +65,8 @@ describe("EmailService", () => {
   });
 
   it("should emit an event whenever an email has been sent to a customer", async () => {
-    // The `EmailService` emits its own higher level events that omit lower
-    // level details like the SMTP server configuration.
+    // The `EmailService` emits its own higher level `"emailSentToCustomer"`
+    // events that omit lower level details like the SMTP server configuration.
     const smtpClient = SmtpClient.createNull();
     const emailService = new EmailService(
       {
@@ -96,7 +96,6 @@ describe("EmailService", () => {
   });
 
   it("should not emit an event sending the email failed", async () => {
-    // We ensure that the event is not emitted when sending the email failed.
     const expectedError = new Error("Send failed");
 
     // We configure the Null `SmtpClient` instance to throw a custom error when

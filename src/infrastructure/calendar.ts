@@ -11,18 +11,17 @@ export type NullConfiguration = {
 export type DateFactory = () => Pick<Date, "getMonth" | "getFullYear">;
 
 export class Calendar implements ICalendar {
+  // The `create` factory method creates an instance with the real side effect.
+  // In this case creating `Date` instances that access the global system state.
   static create() {
-    // The `create` factory method creates an instance with the real side
-    // effect. In this case creating `Date` instances that access the global
-    // system state.
     return new Calendar(() => new Date());
   }
 
+  // The `createNull` facory method creates an instance with a configured stub
+  // instead of the actual side effect. Notice that we only stub out external
+  // code (in this case the `Date` object provided by the JavaScript runtime),
+  // never our own classes.
   static createNull(nullConfiguration?: NullConfiguration) {
-    // The `createNull` facory method creates an instance with a configured stub
-    // instead of the actual side effect. Notice that we only stub out external
-    // code (in this case the `Date` object provided by the JavaScript runtime),
-    // never our own classes.
     return new Calendar(createDateStub(nullConfiguration));
   }
 

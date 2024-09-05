@@ -13,29 +13,35 @@ import { HttpClient } from "./http-client";
 import { captureEvents } from "../spec-helpers";
 
 describe("HttpClient", () => {
-  let testServer: TestServer;
+  // We use an actual HTTP server in our tests to verify that the `HttpClient`
+  // behaves like we expect.
+  let testHttpServer: TestHttpServer;
 
   beforeAll(async () => {
-    testServer = new TestServer();
-    await testServer.start();
+    testHttpServer = new TestHttpServer();
+    await testHttpServer.start();
   });
 
   beforeEach(async () => {
-    testServer.reset();
+    // Starting and stopping the server is a bit expensive. To speed up our
+    // tests we start the server only once and reset its state after each test.
+    testHttpServer.reset();
   });
 
   afterAll(async () => {
-    if (testServer) {
-      await testServer.stop();
+    if (testHttpServer) {
+      await testHttpServer.stop();
     }
   });
 
   it("should send headers and body to the given URL using the given method", async () => {
+    // Let's create a real `HttpClient` and actually send an HTTP request to our
+    // test server.
     const httpClient = HttpClient.create();
 
     await httpClient.sendRequest({
       method: "POST",
-      url: new URL(`${testServer.host()}/some/path?someQuery=123`),
+      url: testHttpServer.url("/some/path?someQuery=123"),
       headers: {
         "content-type": "application/json",
         "x-my-request-header": "Some header value",
@@ -43,7 +49,7 @@ describe("HttpClient", () => {
       body: '{"some":"data"}',
     });
 
-    expect(testServer.lastRequestReceived).toEqual({
+    expect(testHttpServer.lastRequestReceived).toEqual({
       method: "POST",
       path: "/some/path",
       query: {
@@ -62,10 +68,10 @@ describe("HttpClient", () => {
 
     await httpClient.sendRequest({
       method: "GET",
-      url: new URL(`${testServer.host()}/some/path`),
+      url: testHttpServer.url("/some/path"),
     });
 
-    expect(testServer.lastRequestReceived).toEqual({
+    expect(testHttpServer.lastRequestReceived).toEqual({
       method: "GET",
       path: "/some/path",
       query: {},
@@ -75,7 +81,7 @@ describe("HttpClient", () => {
   });
 
   it("should return the received server response", async () => {
-    testServer.setResponse({
+    testHttpServer.setResponse({
       status: 418,
       headers: {
         "content-type": "text/plain; charset=utf-8",
@@ -87,7 +93,7 @@ describe("HttpClient", () => {
 
     const response = await httpClient.sendRequest({
       method: "GET",
-      url: new URL(`${testServer.host()}/irrelevant`),
+      url: testHttpServer.url("/irrelevant"),
     });
 
     expect(response).toEqual({
@@ -106,10 +112,10 @@ describe("HttpClient", () => {
 
       await httpClient.sendRequest({
         method: "GET",
-        url: new URL(`${testServer.host()}/some/path`),
+        url: testHttpServer.url("/some/path"),
       });
 
-      expect(testServer.lastRequestReceived).toEqual(null);
+      expect(testHttpServer.lastRequestReceived).toEqual(null);
     });
 
     it("should return a default response", async () => {
@@ -291,7 +297,7 @@ type ServerResponse = Readonly<{
   body: string;
 }>;
 
-class TestServer {
+class TestHttpServer {
   lastRequestReceived!: Readonly<{
     method: string;
     path: string;
@@ -307,7 +313,14 @@ class TestServer {
     this._httpServer = null;
 
     this._app = express();
+
+    // This middleware let's us access the request body payload under the `body`
+    // property as a string. Without it we'd need to consume and convert the
+    // stream data ourselves.
     this._app.use(express.text({ type: "*/*" }));
+
+    // Set up a listener for all incoming paths that records the last received
+    // request and responds with a configured status, headers, and body.
     this._app.all("/*", (request, response) => {
       this.lastRequestReceived = {
         method: request.method,
@@ -339,11 +352,17 @@ class TestServer {
   }
 
   async start() {
+    // Seting the listen port to `0` causes the server to choose a random
+    // available port. This means that our tests don't have to rely on a
+    // specific port being available. The `port()` method below tells us the
+    // actual port the test server listens on.
+    const port = 0;
+
     this._httpServer = createServer(this._app);
 
     return new Promise<void>((resolve, reject) => {
       this._httpServer?.on("error", reject);
-      this._httpServer?.listen(0, resolve);
+      this._httpServer?.listen(port, resolve);
     });
   }
 
@@ -364,8 +383,8 @@ class TestServer {
     });
   }
 
-  host() {
-    return `http://localhost:${this.port()}`;
+  url(path: string) {
+    return new URL(path, `http://localhost:${this.port()}`);
   }
 
   port() {
