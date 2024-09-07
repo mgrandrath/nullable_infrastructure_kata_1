@@ -14,7 +14,7 @@ import { captureEvents } from "../spec-helpers";
 
 describe("HttpClient", () => {
   // We use an actual HTTP server in our tests to verify that the `HttpClient`
-  // behaves like we expect.
+  // behaves the way we expect.
   let testHttpServer: TestHttpServer;
 
   beforeAll(async () => {
@@ -108,6 +108,7 @@ describe("HttpClient", () => {
 
   describe("null instance", () => {
     it("should not send a real request", async () => {
+      // Test that we can turn off the side effect.
       const httpClient = HttpClient.createNull();
 
       await httpClient.sendRequest({
@@ -134,6 +135,8 @@ describe("HttpClient", () => {
     });
 
     it("should return configured responses", async () => {
+      // This Null instance has a rather elaborate configuration object. Be
+      // careful not to overdo it!
       const httpClient = HttpClient.createNull({
         "/some/path": {
           status: 200,
@@ -354,7 +357,7 @@ class TestHttpServer {
   async start() {
     // Seting the listen port to `0` causes the server to choose a random
     // available port. This means that our tests don't have to rely on a
-    // specific port being available. The `port()` method below tells us the
+    // specific port to be available. The `port()` method below tells us the
     // actual port the test server listens on.
     const port = 0;
 
