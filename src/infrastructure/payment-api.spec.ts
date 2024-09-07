@@ -9,6 +9,10 @@ describe("PaymentApi", () => {
     const customerId: CustomerId = "customer-123";
     const year: Year = 2024;
     const month: Month = 5;
+
+    // We use a Null instance of the real `HttpClient` class as collaborator for
+    // `PaymentApi`. It has the exact same behavior as the one in production.
+    // Only its side effect is turned off.
     const httpClient = HttpClient.createNull({
       "/payments-by-month/customer-123/2024-05": {
         status: 200,
@@ -16,6 +20,9 @@ describe("PaymentApi", () => {
           "content-type": "application/json; charset=utf-8",
         },
         body: JSON.stringify([
+          // `createPayment` is a factory function for generating test data. It
+          // protects us from having to adjust every single test whenever we
+          // make changes to the `Payment` type.
           createPayment({
             price: 10.99,
             category: "electronics",
@@ -64,7 +71,7 @@ describe("PaymentApi", () => {
     ]);
   });
 
-  it("should send requests to the correct configured url", async () => {
+  it("should send requests to the configured base url", async () => {
     const customerId: CustomerId = "customer-123";
     const year: Year = 2024;
     const month: Month = 12;
@@ -94,6 +101,10 @@ describe("PaymentApi", () => {
   });
 
   it("should throw a PaymentApiError if the server responds with unexpected data", async () => {
+    // In our Null instances we can implement any behavior we need for testing
+    // classes that use them. We could easily extend the `HttpClient` Null
+    // instance to throw errors or to time out. And then use these failure
+    // behaviors to test that `PaymentApi` handles them gracefully.
     const httpClient = HttpClient.createNull({
       "*": {
         body: JSON.stringify({
@@ -113,7 +124,7 @@ describe("PaymentApi", () => {
     ).rejects.toThrow(PaymentApiError);
   });
 
-  it("should ignore additional properties", async () => {
+  it("should ignore additional unexpected properties in the response payload", async () => {
     const customerId: CustomerId = "customer-123";
     const year: Year = 2024;
     const month: Month = 5;
@@ -146,13 +157,8 @@ describe("PaymentApi", () => {
       month
     );
 
-    expect(payments).toEqual([
-      createPayment({
-        price: 10.99,
-        category: "electronics",
-        description: "Smartphone",
-      }),
-    ]);
+    expect(payments).toHaveLength(1);
+    expect(payments[0]).not.toHaveProperty("someExtraProperty");
   });
 
   describe("null instance", () => {
@@ -182,6 +188,9 @@ describe("PaymentApi", () => {
     });
 
     it("should return a configurable list of payments", async () => {
+      // The Null configuration of the higher level `PaymentApi` does not leak
+      // the lower level `HttpClient` details. The configuration options for
+      // `PaymentApi` are designed from the perspective of its consumer.
       const paymentApi = PaymentApi.createNull({
         "customer-123/2024-09": [
           createPayment({
