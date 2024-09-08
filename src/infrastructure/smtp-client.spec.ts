@@ -5,30 +5,38 @@ import { SmtpClient } from "./smtp-client";
 import { captureEvents } from "../spec-helpers";
 
 describe("SmtpClient", () => {
-  let testServer: TestServer;
+  // We use a real SMTP server in our tests in order to verify the actual core
+  // side effect of the `SmtpClient` class. This test is part of our suite of
+  // narrow tests that we run continuously. There is no need for a separate
+  // integration test.
+  let testHttpServer: TestSmtpServer;
 
   beforeAll(async () => {
-    testServer = new TestServer();
-    await testServer.start();
+    testHttpServer = new TestSmtpServer();
+    await testHttpServer.start();
   });
 
   beforeEach(async () => {
-    testServer.reset();
+    // Starting and stopping the server is a bit expensive. To speed up our
+    // tests we start the server only once and reset its state after each test.
+    testHttpServer.reset();
   });
 
   afterAll(async () => {
-    if (testServer) {
-      await testServer.stop();
+    if (testHttpServer) {
+      await testHttpServer.stop();
     }
   });
 
   it("should send an email for real", async () => {
+    // Let's create a real `SmtpClient` and actually send an email to our test
+    // server.
     const smtpClient = SmtpClient.create();
 
     await smtpClient.sendEmail(
       {
         host: "localhost",
-        port: testServer.port(),
+        port: testHttpServer.port(),
       },
       {
         from: "some-sender@example.com",
@@ -38,7 +46,7 @@ describe("SmtpClient", () => {
       }
     );
 
-    expect(testServer.lastEmailReceived).toEqual({
+    expect(testHttpServer.lastEmailReceived).toEqual({
       from: "some-sender@example.com",
       to: "some-receiver@example.org",
       subject: "Important message",
@@ -48,12 +56,28 @@ describe("SmtpClient", () => {
 
   it("should emit an event whenever an email has been sent", async () => {
     const smtpClient = SmtpClient.create();
+
+    // There are other classes that use `SmtpClient` to send out emails. Testing
+    // these other classes is challenging because `sendEmail` does not return
+    // any meaningful data that we could use to detect if `sendEmail` has been
+    // used correctly.
+    //
+    // Instead we have `SmtpClient` emit an `"emailSent"` event whenever an
+    // email has been sent successfully. The difference to using a spy and
+    // assert with what arguments `sendEmail` has been called is very subtle.
+    // Asserting on the method arguments tells you how a class has been
+    // interacted with. Asserting on emitted events tells you what side effects
+    // have been triggered.
+    //
+    // `captureEvents` is a helper function that we use inside tests to capture
+    // emitted events and convert them into an array. This makes it easier write
+    // assertions for the expected events.
     const events = captureEvents(smtpClient.events, "emailSent");
 
     await smtpClient.sendEmail(
       {
         host: "localhost",
-        port: testServer.port(),
+        port: testHttpServer.port(),
       },
       {
         from: "some-sender@example.com",
@@ -67,7 +91,7 @@ describe("SmtpClient", () => {
       {
         smtpServer: {
           host: "localhost",
-          port: testServer.port(),
+          port: testHttpServer.port(),
         },
         email: {
           from: "some-sender@example.com",
@@ -82,6 +106,11 @@ describe("SmtpClient", () => {
   describe("null instance", () => {
     it("fails with a configurable error", async () => {
       const expectedError = new Error("Sending failed");
+
+      // As with all Nullables the Null configuration should be as simple as
+      // possible. In this particular use case we only need to be able to throw
+      // errors when sending emails in order to verify that `EmailService`
+      // handles errors from `SmtpClient` gracefully.
       const smtpClient = SmtpClient.createNull({
         errorOnSend: expectedError,
       });
@@ -133,7 +162,7 @@ describe("SmtpClient", () => {
   });
 });
 
-class TestServer {
+class TestSmtpServer {
   lastEmailReceived!: {
     from: string | undefined;
     to: string | undefined;
@@ -144,11 +173,19 @@ class TestServer {
 
   constructor() {
     this._smtpServer = new SMTPServer({
+      // To keep the complexity of this example manageable we skip transport
+      // encryption and authentication. We would not disable these if this was a
+      // real production app.
       disabledCommands: ["AUTH", "STARTTLS"],
 
+      // Set up a listener for all incoming emails and record the last received
+      // message.
       onData: (stream, _session, callback) => {
         parseEmailStream(stream)
           .then((email) => {
+            // Our `SmtpClient` can only do eaxctly enough for the task at hand.
+            // This means sending mails to a single receiver. There is no need
+            // to add more complexity than we actually use.
             const to = Array.isArray(email.to) ? email.to[0] : email.to;
 
             this.lastEmailReceived = {
@@ -171,10 +208,15 @@ class TestServer {
   }
 
   async start() {
-    return new Promise<void>((resolve) => {
-      this._smtpServer.listen(0, () => {
-        resolve();
-      });
+    // Seting the listen port to `0` causes the server to choose a random
+    // available port. This means that our tests don't have to rely on a
+    // specific port to be available. The `port()` method below tells us the
+    // actual port the test server listens on.
+    const port = 0;
+
+    return new Promise<void>((resolve, reject) => {
+      this._smtpServer.on("error", reject);
+      this._smtpServer.listen(port, resolve);
     });
   }
 

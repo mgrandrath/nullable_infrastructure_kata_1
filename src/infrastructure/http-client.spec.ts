@@ -13,8 +13,10 @@ import { HttpClient } from "./http-client";
 import { captureEvents } from "../spec-helpers";
 
 describe("HttpClient", () => {
-  // We use an actual HTTP server in our tests to verify that the `HttpClient`
-  // behaves the way we expect.
+  // We use a real HTTP server in our tests in order to verify the actual core
+  // side effect of the `HttpClient` class. This test is part of our suite of
+  // narrow tests that we run continuously. There is no need for a separate
+  // integration test.
   let testHttpServer: TestHttpServer;
 
   beforeAll(async () => {
