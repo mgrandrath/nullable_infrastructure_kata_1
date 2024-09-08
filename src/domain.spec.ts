@@ -9,12 +9,12 @@ import {
 import { createPayment } from "./spec-helpers";
 
 describe("unusualSpendingToEmailMessage", () => {
-  it("should return null when there is no unusual spending", () => {
+  it("should throw a TypeError when called with an empty object", () => {
     const unusualSpending: UnusualSpending = {};
 
-    const email = unusualSpendingToEmailMessage(unusualSpending);
-
-    expect(email).toEqual(null);
+    expect(() => unusualSpendingToEmailMessage(unusualSpending)).toThrow(
+      new TypeError("Cannot create an email message from an empty object")
+    );
   });
 
   it("should create an email message from a single unusual spending", () => {
@@ -85,7 +85,7 @@ describe("detectUnusualSpending", () => {
       paymentsThisMonth
     );
 
-    expect(unusualSpending).toEqual({});
+    expect(unusualSpending).toEqual(null);
   });
 
   it("should detect no unusual spending when no payment has been made this month", () => {
@@ -97,7 +97,7 @@ describe("detectUnusualSpending", () => {
       paymentsThisMonth
     );
 
-    expect(unusualSpending).toEqual({});
+    expect(unusualSpending).toEqual(null);
   });
 
   it("should detect no unusual spending when payment increases less than 50%", () => {
@@ -113,7 +113,7 @@ describe("detectUnusualSpending", () => {
       paymentsThisMonth
     );
 
-    expect(unusualSpending).toEqual({});
+    expect(unusualSpending).toEqual(null);
   });
 
   it("should detect an unusual spending when payment increases at least 50%", () => {

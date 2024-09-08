@@ -20,7 +20,7 @@ export const unusualSpendingToEmailMessage = (
 ) => {
   const categories = Object.keys(unusualSpending);
   if (categories.length === 0) {
-    return null;
+    throw new TypeError("Cannot create an email message from an empty object");
   }
 
   const totalSpending = categories
@@ -58,17 +58,18 @@ export const detectUnusualSpending = (
 ): UnusualSpending => {
   const lastSpending = groupPaymentsByCategory(lastMonth);
   const currentSpending = groupPaymentsByCategory(thisMonth);
+  const spendingEntries = Object.keys(currentSpending).flatMap((category) => {
+    const spending = currentSpending[category] ?? 0;
+    const before = lastSpending[category] ?? 0;
 
-  return Object.fromEntries(
-    Object.keys(currentSpending).flatMap((category) => {
-      const spending = currentSpending[category] ?? 0;
-      const before = lastSpending[category] ?? 0;
+    return isUnusualSpending(spending, before)
+      ? [[category, { spending, before }]]
+      : [];
+  });
 
-      return isUnusualSpending(spending, before)
-        ? [[category, { spending, before }]]
-        : [];
-    })
-  );
+  return spendingEntries.length > 0
+    ? Object.fromEntries(spendingEntries)
+    : null;
 };
 
 export const groupPaymentsByCategory = (payments: Payment[]) => {

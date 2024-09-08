@@ -52,11 +52,11 @@ export const triggerUnusualSpendingEmail = async (
     previousPayments,
     currentPayments
   );
-  const emailMessage = unusualSpendingToEmailMessage(unusualSpending);
-  if (!emailMessage) {
+  if (!unusualSpending) {
     return;
   }
 
+  const emailMessage = unusualSpendingToEmailMessage(unusualSpending);
   await emailService.sendEmailToCustomer(
     customerId,
     emailMessage.subject,
