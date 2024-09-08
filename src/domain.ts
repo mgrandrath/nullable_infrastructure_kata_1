@@ -95,9 +95,9 @@ export const detectUnusualSpending = (
 
 export const groupPaymentsByCategory = (payments: Payment[]) => {
   return payments.reduce(
-    (acc, payment) => ({
+    (acc, { category, price }) => ({
       ...acc,
-      [payment.category]: (acc[payment.category] ?? 0) + payment.price,
+      [category]: (acc[category] ?? 0) + price,
     }),
     {} as Record<string, number>
   );

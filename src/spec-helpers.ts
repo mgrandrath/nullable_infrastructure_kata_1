@@ -40,16 +40,20 @@ export const captureEvents = <T extends EventMap<T>, K extends keyof T>(
   eventEmitter: EventEmitter<T>,
   eventName: Key<K, T>
 ): EventTracker<Args<K, T>[0]> => {
-  const events: Args<K, T>[0][] = [];
+  const capturedEvents: Args<K, T>[0][] = [];
 
   eventEmitter.on(eventName, ((...args: Args<K, T>) => {
-    events.push(args[0]);
+    capturedEvents.push(args[0]);
   }) as Listener<K, T, (...args: any[]) => void>);
 
   return {
     data: () => {
-      const result = [...events];
-      events.length = 0;
+      const result = [...capturedEvents];
+
+      // Setting the `length` property of an aray to `0` effectively empties the
+      // array.
+      capturedEvents.length = 0;
+
       return result;
     },
   };
