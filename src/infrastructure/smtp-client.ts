@@ -19,20 +19,34 @@ export type NullConfiguration = {
   errorOnSend?: SMTPError;
 };
 
+// The event map defines the events that the `SmtpClient` emits. In this case it
+// emits `"emailSent"` events with `smtpServer` and `email` properties. The
+// reason the event schema is wrapped in an array is that the native Node.js
+// event emitters allow emitting an arbitrary number of arguments for any event
+// type.
 export type SmtpClientEventMap = {
   emailSent: [{ smtpServer: SmtpServerAddress; email: Email }];
 };
 
+// We create a subset of the third party `SMTPConnection` interface that we
+// actually use in our implementation. This subset can grow over time as needed.
 type Connection = Pick<SMTPConnection, "connect" | "send" | "close">;
 type ConnectionFactory = (smtpServerAdress: SmtpServerAddress) => Connection;
 
 export class SmtpClient {
   events = new EventEmitter<SmtpClientEventMap>();
 
+  // The `create` factory method creates an instance with the real side effect.
+  // In this case this is creating `SMTPConnection` instances provided by the
+  // `nodemailer` package.
   static create() {
     return new SmtpClient(createRealConnection());
   }
 
+  // The `createNull` facory method creates an instance with a configured stub
+  // instead of the actual side effect. Notice that we only stub out external
+  // code (in this case the `SMTPConnection` class provided by the `nodemailer`
+  // package), never our own classes.
   static createNull(nullConfiguration?: NullConfiguration) {
     return new SmtpClient(createNullConnection(nullConfiguration));
   }
@@ -72,6 +86,10 @@ export class SmtpClient {
           }
         );
       });
+
+      // We emit an event that the email has been sent. We deliberately call
+      // `emit` *after* the side effect so that it is not emitted when sending
+      // the request failed with an error.
       this.events.emit("emailSent", { smtpServer, email });
     } finally {
       connection.close();
@@ -79,6 +97,9 @@ export class SmtpClient {
   }
 
   private async connect(smtpServerAdress: SmtpServerAddress) {
+    // We use the injected `_createConnection` function without knowing if it is
+    // the real one or the stub. All the code in this method gets executed
+    // inside our tests.
     const connection = this._createConnection(smtpServerAdress);
 
     await new Promise<void>((resolve, reject) => {
@@ -108,6 +129,12 @@ const createNullConnection =
   () =>
     new NullConnection(nullConfiguration);
 
+// The embedded stub only implements the bare minimum so that it can work with
+// the above implementation. We don't want to implement an elaborate fake object
+// but rather keep it as simple as possible. Here, this means we only implement
+// the `connect`, `send`, and `close` methods. The tight coupling between the
+// `SmtpClient` class above and this stub is the reason we implement both in the
+// same file.
 class NullConnection implements Connection {
   constructor(private _configuration: NullConfiguration) {}
 

@@ -47,7 +47,7 @@ export class Calendar implements ICalendar {
 }
 
 // We only implement the bare minimum that we need in order to replace the
-// `Date` class in our use cases. Here, this means we just implement the
+// `Date` class in our use cases. Here, this means we only implement the
 // `getMonth` and `getFullYear` methods. The tight coupling between the
 // `Calendar` class above and this stub is the reason we implement both in the
 // same file.
