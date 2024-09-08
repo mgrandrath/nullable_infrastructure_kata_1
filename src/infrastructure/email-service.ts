@@ -1,6 +1,5 @@
 import EventEmitter from "events";
-import { CustomerId } from "../domain";
-import { IEmailService } from "../trigger-unusual-spending-email";
+import { CustomerId, IEmailService } from "../domain";
 import { SmtpClient, SmtpServerAddress } from "./smtp-client";
 
 export type EmailServiceConfiguration = {

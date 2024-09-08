@@ -1,5 +1,4 @@
-import { Month, Year } from "../domain";
-import { ICalendar } from "../trigger-unusual-spending-email";
+import { ICalendar, Month, Year } from "../domain";
 
 export type NullConfiguration = {
   month: Month;

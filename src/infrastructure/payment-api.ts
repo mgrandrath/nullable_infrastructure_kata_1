@@ -1,10 +1,9 @@
 import z from "zod";
-import { CustomerId, Month, Payment, Year } from "../domain";
+import { CustomerId, IPaymentsApi, Month, Payment, Year } from "../domain";
 import {
   HttpClient,
   NullConfiguration as HttpClientNullConfiguration,
 } from "./http-client";
-import { IPaymentsApi } from "../trigger-unusual-spending-email";
 
 const ResponseSchema = z.array(
   z.object({

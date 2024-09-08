@@ -1,32 +1,11 @@
 import {
   CustomerId,
   detectUnusualSpending,
-  Month,
-  Payment,
+  ICalendar,
+  IEmailService,
+  IPaymentsApi,
   unusualSpendingToEmailMessage,
-  Year,
 } from "./domain";
-
-export interface ICalendar {
-  getCurrentMonthAndYear: () => { month: Month; year: Year };
-  getPreviousMonthAndYear: () => { month: Month; year: Year };
-}
-
-export interface IPaymentsApi {
-  fetchUserPaymentsByMonth: (
-    customerId: CustomerId,
-    year: Year,
-    month: Month
-  ) => Promise<Payment[]>;
-}
-
-export interface IEmailService {
-  sendEmailToCustomer: (
-    customerId: CustomerId,
-    subject: string,
-    body: string
-  ) => Promise<void>;
-}
 
 export const triggerUnusualSpendingEmail = async (
   calendar: ICalendar,
