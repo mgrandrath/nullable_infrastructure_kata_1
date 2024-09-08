@@ -1,5 +1,6 @@
 import z from "zod";
-import { CustomerId, IPaymentsApi, Month, Payment, Year } from "../domain";
+import { IPaymentsApi } from "../application";
+import { CustomerId, Month, Payment, Year } from "../domain";
 import {
   HttpClient,
   NullConfiguration as HttpClientNullConfiguration,

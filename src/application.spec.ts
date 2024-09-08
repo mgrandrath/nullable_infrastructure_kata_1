@@ -3,7 +3,7 @@ import { captureEvents, createPayment } from "./spec-helpers";
 import { Calendar } from "./infrastructure/calendar";
 import { PaymentApi } from "./infrastructure/payment-api";
 import { EmailService } from "./infrastructure/email-service";
-import { triggerUnusualSpendingEmail } from "./trigger-unusual-spending-email";
+import { triggerUnusualSpendingEmail } from "./application";
 
 // The function `triggerUnusualSpendingEmail` is the place where domain logic
 // and infrastructure are connected. It is tests for this kind of code where the

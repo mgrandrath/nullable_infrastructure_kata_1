@@ -1,4 +1,5 @@
-import { ICalendar, Month, Year } from "../domain";
+import { ICalendar } from "../application";
+import { Month, Year } from "../domain";
 
 export type NullConfiguration = {
   month: Month;

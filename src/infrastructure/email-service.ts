@@ -1,5 +1,6 @@
 import EventEmitter from "events";
-import { CustomerId, IEmailService } from "../domain";
+import { IEmailService } from "../application";
+import { CustomerId } from "../domain";
 import { SmtpClient, SmtpServerAddress } from "./smtp-client";
 
 export type EmailServiceConfiguration = {
