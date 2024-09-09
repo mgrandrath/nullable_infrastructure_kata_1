@@ -71,12 +71,16 @@ exactly the way we need them to in each individual test.
 One popular approach to provide such controlled infrastructure objects is to use
 so-called "mock objects" or "mocks". These are objects that implement the same
 interfaces as our infrastructure but are completely separate from our own
-production implementations. They are usually created using a mocking library or
-framework that automatically creates mock objects for a given interface. A
-significant downside of this approach is that tests that use mocks focus on
-testing the interactions between the tested code and the injected dependency
-instead of the resulting behavior. In general this leads to tests that are
-tightly coupled to implementation internals and that tend to hinder refactoring.
+production implementations. Instead of triggering a side effect a mock records
+the methods that have been called on it and the arguments that have been passed.
+The test then uses this information to assert that the tested code invoked the
+expected methods with the correct data. They are usually created using a mocking
+library or framework that automatically creates mock objects for a given
+interface. A significant downside of this approach is that tests that use mocks
+focus on testing the interactions between the tested code and the injected
+dependency instead of the resulting behavior. In general this leads to tests
+that are tightly coupled to implementation internals and that tend to hinder
+refactoring.
 
 The second approach is to use "fakes". These are implementations of our
 infrastructure interfaces that are specifically designed to be used inside
