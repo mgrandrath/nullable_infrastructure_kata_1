@@ -17,7 +17,7 @@ import { triggerUnusualSpendingEmail } from "./application";
 // would be significantly harder to follow. The tests would also give you less
 // confidence because they would not detect bugs from the interplay between the
 // `triggerUnusualSpendingEmail` function and the infrastructure classes. After
-// all mocks only verify that methods have been called in a certain way and not
+// all, mocks only verify that methods have been called in a certain way and not
 // that these methods had the effect you expected. You would need to write
 // additional integration tests for this. At the same time tests using mocks
 // would be more brittle because they break when a refactoring changes the
