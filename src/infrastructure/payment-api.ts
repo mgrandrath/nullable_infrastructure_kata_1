@@ -18,7 +18,12 @@ export type PaymentApiConfiguration = {
   baseUrl: URL;
 };
 
-export type NullConfiguration = Record<CustomerId, Payment[]>;
+export type NullConfiguration = {
+  customerId: CustomerId;
+  month: Month;
+  year: Year;
+  payments: Payment[];
+}[];
 
 export class PaymentApiError extends Error {}
 
@@ -46,6 +51,11 @@ export class PaymentApi implements IPaymentsApi {
       { baseUrl: new URL("https://example.com") },
       HttpClient.createNull(convertNullConfiguration(nullConfiguration))
     );
+  }
+
+  static paymentsApiPath(customerId: CustomerId, year: Year, month: Month) {
+    const paddedMonth = month.toString().padStart(2, "0");
+    return `payments-by-month/${customerId}/${year}-${paddedMonth}`;
   }
 
   constructor(
@@ -88,7 +98,7 @@ export class PaymentApi implements IPaymentsApi {
   private paymentsUrl(customerId: CustomerId, year: Year, month: Month) {
     const paddedMonth = month.toString().padStart(2, "0");
     return new URL(
-      `payments-by-month/${customerId}/${year}-${paddedMonth}`,
+      PaymentApi.paymentsApiPath(customerId, year, month),
       this._configuration.baseUrl
     );
   }
@@ -98,23 +108,24 @@ export class PaymentApi implements IPaymentsApi {
 // arguably one of the uglier aspects of the Nullable pattern. We hide it down
 // here out of sight. ;-)
 const convertNullConfiguration = (
-  nullConfiguration: NullConfiguration = {}
+  nullConfiguration: NullConfiguration = []
 ): HttpClientNullConfiguration => {
   const responses = Object.fromEntries(
-    Object.entries(nullConfiguration).map(([idAndMonth, payments]) => {
-      return [
-        `/payments-by-month/${idAndMonth}`,
-        {
-          status: 200,
-          body: JSON.stringify(payments),
-        },
-      ];
+    nullConfiguration.map(({ customerId, year, month, payments }) => {
+      const path = `/${PaymentApi.paymentsApiPath(customerId, year, month)}`;
+      const response = {
+        status: 200,
+        body: JSON.stringify(payments),
+      };
+      return [path, response];
     })
   );
+
   const defaultResponse = {
     status: 200,
-    body: "[]",
+    body: JSON.stringify([]),
   };
+
   return {
     ...responses,
     "*": defaultResponse,

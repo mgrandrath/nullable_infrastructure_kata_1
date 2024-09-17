@@ -20,12 +20,13 @@ import { triggerUnusualSpendingEmail } from "./application";
 // all, mocks only verify that methods have been called in a certain way and not
 // that these methods had the effect you expected. You would need to write
 // additional integration tests for this. At the same time tests using mocks
-// would be more brittle because they break when a refactoring changes the
-// interaction with an infrastructure class.
+// would be more brittle because they break and need adjustments when a
+// refactoring changes the interaction with an infrastructure class.
 describe("triggerUnusualSpendingEmail", () => {
   it("should send an email when unusual spending is detected", async () => {
     const year = 2024;
-    const month = 11;
+    const currentMonth = 11;
+    const previousMonth = currentMonth - 1;
     const customerId = "customer-123";
     const previousMonthPayments = [
       createPayment({ price: 99.99, category: "electronics" }),
@@ -40,11 +41,21 @@ describe("triggerUnusualSpendingEmail", () => {
       createPayment({ price: 200.49, category: "beauty" }),
     ];
 
-    const calendar = Calendar.createNull({ month, year });
-    const paymentsApi = PaymentApi.createNull({
-      [`${customerId}/${year}-${month - 1}`]: previousMonthPayments,
-      [`${customerId}/${year}-${month}`]: currentMonthPayments,
-    });
+    const calendar = Calendar.createNull({ month: currentMonth, year });
+    const paymentsApi = PaymentApi.createNull([
+      {
+        customerId,
+        year,
+        month: previousMonth,
+        payments: previousMonthPayments,
+      },
+      {
+        customerId,
+        year,
+        month: currentMonth,
+        payments: currentMonthPayments,
+      },
+    ]);
     const emailService = EmailService.createNull();
     const sentEmails = captureEvents(
       emailService.events,
@@ -80,7 +91,8 @@ describe("triggerUnusualSpendingEmail", () => {
 
   it("should not send an email when no unusual spending is detected", async () => {
     const year = 2024;
-    const month = 11;
+    const currentMonth = 11;
+    const previousMonth = currentMonth - 1;
     const customerId = "customer-123";
     const previousMonthPayments = [
       createPayment({ price: 99.99, category: "electronics" }),
@@ -94,11 +106,21 @@ describe("triggerUnusualSpendingEmail", () => {
       createPayment({ price: 200.49, category: "clothing" }),
     ];
 
-    const calendar = Calendar.createNull({ month, year });
-    const paymentsApi = PaymentApi.createNull({
-      [`${customerId}/${year}-${month - 1}`]: previousMonthPayments,
-      [`${customerId}/${year}-${month}`]: currentMonthPayments,
-    });
+    const calendar = Calendar.createNull({ month: currentMonth, year });
+    const paymentsApi = PaymentApi.createNull([
+      {
+        customerId,
+        year,
+        month: previousMonth,
+        payments: previousMonthPayments,
+      },
+      {
+        customerId,
+        year,
+        month: currentMonth,
+        payments: currentMonthPayments,
+      },
+    ]);
     const emailService = EmailService.createNull();
     const sentEmails = captureEvents(
       emailService.events,

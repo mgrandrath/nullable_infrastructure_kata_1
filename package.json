@@ -2,6 +2,7 @@
   "name": "unusual_spending_kata_1",
   "version": "1.0.0",
   "main": "index.js",
+  "packageManager": "yarn@1.22.22",
   "author": "Martin Grandrath <martin.grandrath@codecentric.de>",
   "license": "MIT",
   "scripts": {

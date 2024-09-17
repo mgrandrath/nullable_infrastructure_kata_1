@@ -191,15 +191,20 @@ describe("PaymentApi", () => {
       // The Null configuration of the higher level `PaymentApi` does not leak
       // the lower level `HttpClient` details. The configuration options for
       // `PaymentApi` are designed from the perspective of its consumer.
-      const paymentApi = PaymentApi.createNull({
-        "customer-123/2024-09": [
-          createPayment({
-            price: 10.99,
-            category: "groceries",
-            description: "Dinner",
-          }),
-        ],
-      });
+      const paymentApi = PaymentApi.createNull([
+        {
+          customerId: "customer-123",
+          month: 9,
+          year: 2024,
+          payments: [
+            createPayment({
+              price: 10.99,
+              category: "groceries",
+              description: "Dinner",
+            }),
+          ],
+        },
+      ]);
 
       const payments = await paymentApi.fetchUserPaymentsByMonth(
         "customer-123",
