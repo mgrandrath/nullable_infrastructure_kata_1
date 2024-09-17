@@ -66,7 +66,11 @@ export const triggerUnusualSpendingEmail = async (
     return;
   }
 
-  const emailMessage = unusualSpendingToEmailMessage(unusualSpending);
+  const emailMessage = unusualSpendingToEmailMessage({
+    year: current.year,
+    month: current.month,
+    unusualSpending,
+  });
   await emailService.sendEmailToCustomer(
     customerId,
     emailMessage.subject,

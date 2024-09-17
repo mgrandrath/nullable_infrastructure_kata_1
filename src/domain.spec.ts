@@ -8,11 +8,20 @@ import {
 } from "./domain";
 import { createPayment } from "./spec-helpers";
 
+const irrelevantYear = 2020;
+const irrelevantMonth = 3;
+
 describe("unusualSpendingToEmailMessage", () => {
   it("should throw a TypeError when called with an empty object", () => {
     const unusualSpending: UnusualSpending = {};
 
-    expect(() => unusualSpendingToEmailMessage(unusualSpending)).toThrow(
+    expect(() =>
+      unusualSpendingToEmailMessage({
+        year: irrelevantYear,
+        month: irrelevantMonth,
+        unusualSpending,
+      })
+    ).toThrow(
       new TypeError("Cannot create an email message from an empty object")
     );
   });
@@ -25,14 +34,18 @@ describe("unusualSpendingToEmailMessage", () => {
       },
     };
 
-    const email = unusualSpendingToEmailMessage(unusualSpending);
+    const email = unusualSpendingToEmailMessage({
+      year: 2024,
+      month: 5,
+      unusualSpending,
+    });
 
     expect(email).toEqual({
       subject: "Unusual spending of $80 detected!",
       body: [
         "Hello card user!",
         "",
-        "We have detected unusually high spending on your card in these categories:",
+        "We have detected unusually high spending on your card in these categories in 2024-05:",
         "",
         "* You spent $80 on groceries",
         "",
@@ -55,14 +68,18 @@ describe("unusualSpendingToEmailMessage", () => {
       },
     };
 
-    const email = unusualSpendingToEmailMessage(unusualSpending);
+    const email = unusualSpendingToEmailMessage({
+      year: 2024,
+      month: 5,
+      unusualSpending,
+    });
 
     expect(email).toEqual({
       subject: "Unusual spending of $200 detected!",
       body: [
         "Hello card user!",
         "",
-        "We have detected unusually high spending on your card in these categories:",
+        "We have detected unusually high spending on your card in these categories in 2024-05:",
         "",
         "* You spent $80 on groceries",
         "* You spent $120 on vacation",

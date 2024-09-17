@@ -76,7 +76,7 @@ describe("triggerUnusualSpendingEmail", () => {
         body: [
           "Hello card user!",
           "",
-          "We have detected unusually high spending on your card in these categories:",
+          "We have detected unusually high spending on your card in these categories in 2024-11:",
           "",
           "* You spent $445.89 on electronics",
           "* You spent $200.49 on beauty",

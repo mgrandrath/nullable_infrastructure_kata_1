@@ -15,14 +15,21 @@ export type UnusualSpending = {
   };
 };
 
-export const unusualSpendingToEmailMessage = (
-  unusualSpending: UnusualSpending
-) => {
+export const unusualSpendingToEmailMessage = ({
+  year,
+  month,
+  unusualSpending,
+}: {
+  year: Year;
+  month: Month;
+  unusualSpending: UnusualSpending;
+}) => {
   const categories = Object.keys(unusualSpending);
   if (categories.length === 0) {
     throw new TypeError("Cannot create an email message from an empty object");
   }
 
+  const paddedMonth = month.toString().padStart(2, "0");
   const totalSpending = categories
     .map((category) => unusualSpending[category]!.spending)
     .reduce((totalSpending, spending) => totalSpending + spending, 0);
@@ -31,7 +38,7 @@ export const unusualSpendingToEmailMessage = (
   const body = [
     "Hello card user!",
     "",
-    "We have detected unusually high spending on your card in these categories:",
+    `We have detected unusually high spending on your card in these categories in ${year}-${paddedMonth}:`,
     "",
     ...categories.map(
       (category) =>
