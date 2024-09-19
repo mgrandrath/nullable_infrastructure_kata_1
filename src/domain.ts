@@ -1,6 +1,9 @@
 export type CustomerId = string;
-export type Year = number;
-export type Month = number;
+
+export type MonthInYear = {
+  month: number;
+  year: number;
+};
 
 export type Payment = {
   price: number;
@@ -16,12 +19,10 @@ export type UnusualSpending = {
 };
 
 export const unusualSpendingToEmailMessage = ({
-  year,
-  month,
+  monthInYear: { month, year },
   unusualSpending,
 }: {
-  year: Year;
-  month: Month;
+  monthInYear: MonthInYear;
   unusualSpending: UnusualSpending;
 }) => {
   const categories = Object.keys(unusualSpending);

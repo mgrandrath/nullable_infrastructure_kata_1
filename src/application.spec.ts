@@ -4,6 +4,7 @@ import { Calendar } from "./infrastructure/calendar";
 import { PaymentApi } from "./infrastructure/payment-api";
 import { EmailService } from "./infrastructure/email-service";
 import { triggerUnusualSpendingEmail } from "./application";
+import { MonthInYear } from "./domain";
 
 // The function `triggerUnusualSpendingEmail` is the place where domain logic
 // and infrastructure are connected. It is tests for this kind of code where the
@@ -24,10 +25,9 @@ import { triggerUnusualSpendingEmail } from "./application";
 // refactoring changes the interaction with an infrastructure class.
 describe("triggerUnusualSpendingEmail", () => {
   it("should send an email when unusual spending is detected", async () => {
-    const year = 2024;
-    const currentMonth = 11;
-    const previousMonth = currentMonth - 1;
     const customerId = "customer-123";
+    const currentMonth: MonthInYear = { month: 11, year: 2024 };
+    const previousMonth: MonthInYear = { month: 10, year: 2024 };
     const previousMonthPayments = [
       createPayment({ price: 99.99, category: "electronics" }),
       createPayment({ price: 149.99, category: "electronics" }),
@@ -41,18 +41,16 @@ describe("triggerUnusualSpendingEmail", () => {
       createPayment({ price: 200.49, category: "beauty" }),
     ];
 
-    const calendar = Calendar.createNull({ month: currentMonth, year });
+    const calendar = Calendar.createNull(currentMonth);
     const paymentsApi = PaymentApi.createNull([
       {
         customerId,
-        year,
-        month: previousMonth,
+        monthInYear: previousMonth,
         payments: previousMonthPayments,
       },
       {
         customerId,
-        year,
-        month: currentMonth,
+        monthInYear: currentMonth,
         payments: currentMonthPayments,
       },
     ]);
@@ -90,10 +88,9 @@ describe("triggerUnusualSpendingEmail", () => {
   });
 
   it("should not send an email when no unusual spending is detected", async () => {
-    const year = 2024;
-    const currentMonth = 11;
-    const previousMonth = currentMonth - 1;
     const customerId = "customer-123";
+    const currentMonthx: MonthInYear = { month: 11, year: 2024 };
+    const previousMonthx: MonthInYear = { month: 10, year: 2024 };
     const previousMonthPayments = [
       createPayment({ price: 99.99, category: "electronics" }),
       createPayment({ price: 149.99, category: "electronics" }),
@@ -106,18 +103,16 @@ describe("triggerUnusualSpendingEmail", () => {
       createPayment({ price: 200.49, category: "clothing" }),
     ];
 
-    const calendar = Calendar.createNull({ month: currentMonth, year });
+    const calendar = Calendar.createNull(currentMonthx);
     const paymentsApi = PaymentApi.createNull([
       {
         customerId,
-        year,
-        month: previousMonth,
+        monthInYear: previousMonthx,
         payments: previousMonthPayments,
       },
       {
         customerId,
-        year,
-        month: currentMonth,
+        monthInYear: currentMonthx,
         payments: currentMonthPayments,
       },
     ]);

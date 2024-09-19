@@ -1,22 +1,20 @@
 import {
   CustomerId,
   detectUnusualSpending,
-  Month,
+  MonthInYear,
   Payment,
   unusualSpendingToEmailMessage,
-  Year,
 } from "./domain";
 
 export interface ICalendar {
-  getCurrentMonthAndYear: () => { month: Month; year: Year };
-  getPreviousMonthAndYear: () => { month: Month; year: Year };
+  getCurrentMonthAndYear: () => MonthInYear;
+  getPreviousMonthAndYear: () => MonthInYear;
 }
 
 export interface IPaymentsApi {
   fetchUserPaymentsByMonth: (
     customerId: CustomerId,
-    year: Year,
-    month: Month
+    monthInYear: MonthInYear
   ) => Promise<Payment[]>;
 }
 
@@ -44,18 +42,16 @@ export const triggerUnusualSpendingEmail = async (
   emailService: IEmailService,
   customerId: CustomerId
 ) => {
-  const current = calendar.getCurrentMonthAndYear();
-  const previous = calendar.getPreviousMonthAndYear();
+  const currentMonth = calendar.getCurrentMonthAndYear();
+  const previousMonth = calendar.getPreviousMonthAndYear();
 
   const currentPayments = await paymentsApi.fetchUserPaymentsByMonth(
     customerId,
-    current.year,
-    current.month
+    currentMonth
   );
   const previousPayments = await paymentsApi.fetchUserPaymentsByMonth(
     customerId,
-    previous.year,
-    previous.month
+    previousMonth
   );
 
   const unusualSpending = detectUnusualSpending(
@@ -67,8 +63,7 @@ export const triggerUnusualSpendingEmail = async (
   }
 
   const emailMessage = unusualSpendingToEmailMessage({
-    year: current.year,
-    month: current.month,
+    monthInYear: currentMonth,
     unusualSpending,
   });
   await emailService.sendEmailToCustomer(

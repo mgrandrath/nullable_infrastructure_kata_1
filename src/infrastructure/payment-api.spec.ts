@@ -1,14 +1,13 @@
 import { describe, expect, it, vi } from "vitest";
 import { HttpClient } from "./http-client";
-import { CustomerId, Month, Year } from "../domain";
+import { CustomerId, MonthInYear } from "../domain";
 import { captureEvents, createPayment } from "../spec-helpers";
 import { PaymentApi, PaymentApiError } from "./payment-api";
 
 describe("PaymentApi", () => {
   it("should fetch the list of payments for a given customer id and month", async () => {
     const customerId: CustomerId = "customer-123";
-    const year: Year = 2024;
-    const month: Month = 5;
+    const monthInYear: MonthInYear = { month: 5, year: 2024 };
 
     // We use a Null instance of the real `HttpClient` class as collaborator for
     // `PaymentApi`. It has the exact same behavior as the one in production.
@@ -48,8 +47,7 @@ describe("PaymentApi", () => {
 
     const payments = await paymentApi.fetchUserPaymentsByMonth(
       customerId,
-      year,
-      month
+      monthInYear
     );
 
     expect(payments).toEqual([
@@ -73,8 +71,7 @@ describe("PaymentApi", () => {
 
   it("should send requests to the configured base url", async () => {
     const customerId: CustomerId = "customer-123";
-    const year: Year = 2024;
-    const month: Month = 12;
+    const monthInYear: MonthInYear = { month: 12, year: 2024 };
     const httpClient = HttpClient.createNull({
       "/my-api/payments-by-month/customer-123/2024-12": {
         body: "[]",
@@ -86,7 +83,7 @@ describe("PaymentApi", () => {
     );
     const events = captureEvents(httpClient.events, "requestSent");
 
-    await paymentApi.fetchUserPaymentsByMonth(customerId, year, month);
+    await paymentApi.fetchUserPaymentsByMonth(customerId, monthInYear);
 
     expect(events.data()).toEqual([
       expect.objectContaining({
@@ -120,14 +117,19 @@ describe("PaymentApi", () => {
     );
 
     await expect(() =>
-      paymentApi.fetchUserPaymentsByMonth("customer-123", 2020, 2)
+      paymentApi.fetchUserPaymentsByMonth("customer-123", {
+        year: 2020,
+        month: 2,
+      })
     ).rejects.toThrow(PaymentApiError);
   });
 
   it("should ignore additional unexpected properties in the response payload", async () => {
     const customerId: CustomerId = "customer-123";
-    const year: Year = 2024;
-    const month: Month = 5;
+    const monthInYear: MonthInYear = {
+      month: 5,
+      year: 2024,
+    };
     const httpClient = HttpClient.createNull({
       "*": {
         status: 200,
@@ -153,8 +155,7 @@ describe("PaymentApi", () => {
 
     const payments = await paymentApi.fetchUserPaymentsByMonth(
       customerId,
-      year,
-      month
+      monthInYear
     );
 
     expect(payments).toHaveLength(1);
@@ -167,7 +168,10 @@ describe("PaymentApi", () => {
       const paymentApi = PaymentApi.createNull();
 
       await paymentApi
-        .fetchUserPaymentsByMonth("irrelevant-id", 2010, 1)
+        .fetchUserPaymentsByMonth("irrelevant-id", {
+          year: 2010,
+          month: 1,
+        })
         .catch(() => {
           // discard connection errors
         });
@@ -180,8 +184,7 @@ describe("PaymentApi", () => {
 
       const payments = await paymentApi.fetchUserPaymentsByMonth(
         "irrelevant-id",
-        2010,
-        1
+        { year: 2010, month: 1 }
       );
 
       expect(payments).toEqual([]);
@@ -194,8 +197,7 @@ describe("PaymentApi", () => {
       const paymentApi = PaymentApi.createNull([
         {
           customerId: "customer-123",
-          month: 9,
-          year: 2024,
+          monthInYear: { month: 9, year: 2024 },
           payments: [
             createPayment({
               price: 10.99,
@@ -208,8 +210,7 @@ describe("PaymentApi", () => {
 
       const payments = await paymentApi.fetchUserPaymentsByMonth(
         "customer-123",
-        2024,
-        9
+        { year: 2024, month: 9 }
       );
 
       expect(payments).toEqual([

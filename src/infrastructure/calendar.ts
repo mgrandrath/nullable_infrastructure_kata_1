@@ -1,10 +1,7 @@
 import { ICalendar } from "../application";
-import { Month, Year } from "../domain";
+import { MonthInYear } from "../domain";
 
-export type NullConfiguration = {
-  month: Month;
-  year: Year;
-};
+export type NullConfiguration = MonthInYear;
 
 // We create a subset of the built-in `Date` interface that we actually use in
 // our implementation. This subset can grow over time as needed.

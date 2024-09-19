@@ -1,6 +1,6 @@
 import z from "zod";
 import { IPaymentsApi } from "../application";
-import { CustomerId, Month, Payment, Year } from "../domain";
+import { CustomerId, MonthInYear, Payment } from "../domain";
 import {
   HttpClient,
   NullConfiguration as HttpClientNullConfiguration,
@@ -20,8 +20,7 @@ export type PaymentApiConfiguration = {
 
 export type NullConfiguration = {
   customerId: CustomerId;
-  month: Month;
-  year: Year;
+  monthInYear: MonthInYear;
   payments: Payment[];
 }[];
 
@@ -53,7 +52,7 @@ export class PaymentApi implements IPaymentsApi {
     );
   }
 
-  static paymentsApiPath(customerId: CustomerId, year: Year, month: Month) {
+  static paymentsApiPath(customerId: CustomerId, { month, year }: MonthInYear) {
     const paddedMonth = month.toString().padStart(2, "0");
     return `payments-by-month/${customerId}/${year}-${paddedMonth}`;
   }
@@ -65,15 +64,14 @@ export class PaymentApi implements IPaymentsApi {
 
   async fetchUserPaymentsByMonth(
     customerId: CustomerId,
-    year: Year,
-    month: Month
+    monthInYear: MonthInYear
   ) {
     // We use the injected `_httpClient` instance without knowing if it is the
     // real one or the Nulled version. All the code in this method gets executed
     // inside our tests.
     const response = await this._httpClient.sendRequest({
       method: "GET",
-      url: this.paymentsUrl(customerId, year, month),
+      url: this.paymentsUrl(customerId, monthInYear),
     });
 
     try {
@@ -95,10 +93,9 @@ export class PaymentApi implements IPaymentsApi {
     }
   }
 
-  private paymentsUrl(customerId: CustomerId, year: Year, month: Month) {
-    const paddedMonth = month.toString().padStart(2, "0");
+  private paymentsUrl(customerId: CustomerId, monthInYear: MonthInYear) {
     return new URL(
-      PaymentApi.paymentsApiPath(customerId, year, month),
+      PaymentApi.paymentsApiPath(customerId, monthInYear),
       this._configuration.baseUrl
     );
   }
@@ -111,8 +108,8 @@ const convertNullConfiguration = (
   nullConfiguration: NullConfiguration = []
 ): HttpClientNullConfiguration => {
   const responses = Object.fromEntries(
-    nullConfiguration.map(({ customerId, year, month, payments }) => {
-      const path = `/${PaymentApi.paymentsApiPath(customerId, year, month)}`;
+    nullConfiguration.map(({ customerId, payments, monthInYear }) => {
+      const path = `/${PaymentApi.paymentsApiPath(customerId, monthInYear)}`;
       const response = {
         status: 200,
         body: JSON.stringify(payments),

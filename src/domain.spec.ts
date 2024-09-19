@@ -2,14 +2,14 @@ import { describe, expect, it } from "vitest";
 import {
   detectUnusualSpending,
   groupPaymentsByCategory,
+  MonthInYear,
   Payment,
   UnusualSpending,
   unusualSpendingToEmailMessage,
 } from "./domain";
 import { createPayment } from "./spec-helpers";
 
-const irrelevantYear = 2020;
-const irrelevantMonth = 3;
+const irrelevantMonth: MonthInYear = { month: 3, year: 2020 };
 
 describe("unusualSpendingToEmailMessage", () => {
   it("should throw a TypeError when called with an empty object", () => {
@@ -17,8 +17,7 @@ describe("unusualSpendingToEmailMessage", () => {
 
     expect(() =>
       unusualSpendingToEmailMessage({
-        year: irrelevantYear,
-        month: irrelevantMonth,
+        monthInYear: irrelevantMonth,
         unusualSpending,
       })
     ).toThrow(
@@ -35,8 +34,7 @@ describe("unusualSpendingToEmailMessage", () => {
     };
 
     const email = unusualSpendingToEmailMessage({
-      year: 2024,
-      month: 5,
+      monthInYear: { year: 2024, month: 5 },
       unusualSpending,
     });
 
@@ -69,8 +67,7 @@ describe("unusualSpendingToEmailMessage", () => {
     };
 
     const email = unusualSpendingToEmailMessage({
-      year: 2024,
-      month: 5,
+      monthInYear: { year: 2024, month: 5 },
       unusualSpending,
     });
 
