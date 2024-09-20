@@ -1,5 +1,5 @@
-import { ICalendar } from "../application";
-import { MonthInYear } from "../domain";
+import { MonthInYear } from "../domain/domain";
+import { ICalendar } from "../application/interfaces";
 
 export type NullConfiguration = MonthInYear;
 

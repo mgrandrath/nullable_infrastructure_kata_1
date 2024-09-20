@@ -1,10 +1,10 @@
 import z from "zod";
-import { IPaymentsApi } from "../application";
-import { CustomerId, MonthInYear, Payment } from "../domain";
+import { CustomerId, MonthInYear, Payment } from "../domain/domain";
 import {
   HttpClient,
   NullConfiguration as HttpClientNullConfiguration,
 } from "./http-client";
+import { IPaymentsApi } from "../application/interfaces";
 
 const ResponseSchema = z.array(
   z.object({

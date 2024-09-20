@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { HttpClient } from "./http-client";
-import { CustomerId, MonthInYear } from "../domain";
+import { CustomerId, MonthInYear } from "../domain/domain";
 import { captureEvents, createPayment } from "../spec-helpers";
 import { PaymentApi, PaymentApiError } from "./payment-api";
 

@@ -1,7 +1,7 @@
 import { Calendar } from "./infrastructure/calendar";
 import { EmailService } from "./infrastructure/email-service";
 import { PaymentApi } from "./infrastructure/payment-api";
-import { triggerUnusualSpendingEmail } from "./application";
+import { triggerUnusualSpendingEmail } from "./application/trigger-unusual-spending-email";
 
 const API_URL = "http://localhost:3000/";
 const EMAIL_SENDER_ADDRESS = "unusual-spending@my-bank.example.com";

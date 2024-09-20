@@ -1,5 +1,5 @@
 import EventEmitter from "events";
-import { Payment } from "./domain";
+import { Payment } from "./domain/domain";
 
 const factory =
   <T extends object>(defaults: T) =>

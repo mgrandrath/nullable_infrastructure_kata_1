@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { captureEvents, createPayment } from "./spec-helpers";
-import { Calendar } from "./infrastructure/calendar";
-import { PaymentApi } from "./infrastructure/payment-api";
-import { EmailService } from "./infrastructure/email-service";
-import { triggerUnusualSpendingEmail } from "./application";
-import { MonthInYear } from "./domain";
+import { captureEvents, createPayment } from "../spec-helpers";
+import { Calendar } from "../infrastructure/calendar";
+import { PaymentApi } from "../infrastructure/payment-api";
+import { EmailService } from "../infrastructure/email-service";
+import { triggerUnusualSpendingEmail } from "./trigger-unusual-spending-email";
+import { MonthInYear } from "../domain/domain";
 
 // The function `triggerUnusualSpendingEmail` is the place where domain logic
 // and infrastructure are connected. It is tests for this kind of code where the

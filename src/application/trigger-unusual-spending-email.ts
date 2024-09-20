@@ -1,30 +1,5 @@
-import {
-  CustomerId,
-  detectUnusualSpending,
-  MonthInYear,
-  Payment,
-  unusualSpendingToEmailMessage,
-} from "./domain";
-
-export interface ICalendar {
-  getCurrentMonthAndYear: () => MonthInYear;
-  getPreviousMonthAndYear: () => MonthInYear;
-}
-
-export interface IPaymentsApi {
-  fetchUserPaymentsByMonth: (
-    customerId: CustomerId,
-    monthInYear: MonthInYear
-  ) => Promise<Payment[]>;
-}
-
-export interface IEmailService {
-  sendEmailToCustomer: (
-    customerId: CustomerId,
-    subject: string,
-    body: string
-  ) => Promise<void>;
-}
+import { CustomerId, detectUnusualSpending, unusualSpendingToEmailMessage } from "../domain/domain";
+import { ICalendar, IEmailService, IPaymentsApi } from "./interfaces";
 
 // This function connects domain logic and infrastructure (also known as side
 // effects). It uses the A-Frame pattern [^1]. The pure domain logic functions

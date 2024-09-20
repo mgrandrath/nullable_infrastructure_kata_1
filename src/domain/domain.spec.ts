@@ -7,7 +7,7 @@ import {
   UnusualSpending,
   unusualSpendingToEmailMessage,
 } from "./domain";
-import { createPayment } from "./spec-helpers";
+import { createPayment } from "../spec-helpers";
 
 const irrelevantMonth: MonthInYear = { month: 3, year: 2020 };
 
