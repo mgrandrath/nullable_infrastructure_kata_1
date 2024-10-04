@@ -55,10 +55,10 @@ describe("Calendar", () => {
       // We always want to be able to create functional Null instances without
       // being forced to pass in a configuration object. This is called
       // Parameterless Instantiation[^1] and comes in handy when we need a
-      // calendar object inside a test that does not care about the specific
+      // calendar object within a test that does not care about the specific
       // date it returns.
       //
-      // [^1] TODO link
+      // [^1] https://www.jamesshore.com/v2/projects/nullables/testing-without-mocks#instantiation
       const calendar = Calendar.createNull();
 
       expect(calendar.getCurrentMonthAndYear()).toEqual({

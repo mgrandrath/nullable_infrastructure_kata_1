@@ -23,12 +23,12 @@ generators, reading and writing files on disk, network communication, database
 queries, third party APIs, and so on.
 
 This separation is at the heart of various architectural patterns like for
-example the Hexagonal Architecture (TODO link) which lends itself very well to
-the Nullable Infrastructure pattern. In a nutshell Hexagonal Architecture
-defines a domain core which is pure. This core then interacts with the outside
-world via ports that are then connected to adapaters that implement the concrete
-side effects. Using Nullable Infrastructure for implementing these adapters is a
-perfect fit.
+example the [Hexagonal Architecture](<https://en.wikipedia.org/wiki/Hexagonal_architecture_(software)>)
+which lends itself very well to the Nullable Infrastructure pattern. In a
+nutshell Hexagonal Architecture defines a domain core which is pure. This core
+then interacts with the outside world via ports that are then connected to
+adapaters that implement the concrete side effects. Using Nullable
+Infrastructure for implementing these adapters is a perfect fit.
 
 ## The "Unusual Spending" kata
 
@@ -62,11 +62,12 @@ state as well. Whether they succeed or fail depends on the state these other
 systems are in.
 
 For this reason why we implement our domain logic in a way so that we can pass
-the infrastructure implementations in. This pattern is called "dependency
-injection" (TODO link) because we pass in (or "inject") the dependencies our
-code needs. It enables us to pass in implementations of the infrastructure
-interfaces that we have full control over and that we can configure to behave
-exactly the way we need them to in each individual test.
+the infrastructure implementations in. This pattern is called
+[dependency injection](https://en.wikipedia.org/wiki/Dependency_injection)
+because we pass in (or "inject") the dependencies our code needs. It enables us
+to pass in implementations of the infrastructure interfaces that we have full
+control over and that we can configure to behave exactly the way we need them to
+in each individual test.
 
 One popular approach to provide such controlled infrastructure objects is to use
 so-called "mock objects" or "mocks". These are objects that implement the same
@@ -95,7 +96,7 @@ implementations but with their side effect short-circuited. This keeps our tests
 fast and independent of external state. It also avoids the need for third party
 mocking frameworks that can get quite complex. Additionally it results in stable
 tests that don't break easily when the code is refactored. This encourages the
-practice of evolutionary design (TODO link).
+practice of [continuous design](https://en.wikipedia.org/wiki/Continuous_design).
 
 ## The Nullable Infrastructure implementation
 
