@@ -24,6 +24,12 @@ export type EmailServiceEventMap = {
 };
 
 export class EmailService implements IEmailService {
+  // Create an `EventEmitter` instance that is used for Output Tracking[^1] in
+  // tests. This implementation deviates from James Shore's original approach of
+  // creating `OutputTracker` objects. In my opinion using an `EventEmitter` is
+  // more flexible and enables other uses such as logging.
+  //
+  // [^1] https://www.jamesshore.com/v2/projects/nullables/testing-without-mocks#output-tracking
   events = new EventEmitter<EmailServiceEventMap>();
 
   // The `create` factory method creates an instance with the real side effect.
