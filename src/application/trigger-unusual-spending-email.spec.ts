@@ -57,14 +57,14 @@ describe("triggerUnusualSpendingEmail", () => {
     const emailService = EmailService.createNull();
     const sentEmails = captureEvents(
       emailService.events,
-      "emailSentToCustomer"
+      "emailSentToCustomer",
     );
 
     await triggerUnusualSpendingEmail(
       calendar,
       paymentsApi,
       emailService,
-      customerId
+      customerId,
     );
 
     expect(sentEmails.data()).toEqual([
@@ -119,14 +119,14 @@ describe("triggerUnusualSpendingEmail", () => {
     const emailService = EmailService.createNull();
     const sentEmails = captureEvents(
       emailService.events,
-      "emailSentToCustomer"
+      "emailSentToCustomer",
     );
 
     await triggerUnusualSpendingEmail(
       calendar,
       paymentsApi,
       emailService,
-      customerId
+      customerId,
     );
 
     expect(sentEmails.data()).toEqual([]);

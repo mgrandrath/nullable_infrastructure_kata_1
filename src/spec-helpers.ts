@@ -22,15 +22,15 @@ type AnyRest = [...args: any[]];
 type Args<K, T> = T extends DefaultEventMap
   ? AnyRest
   : K extends keyof T
-  ? T[K]
-  : never;
+    ? T[K]
+    : never;
 type Listener<K, T, F> = T extends DefaultEventMap
   ? F
   : K extends keyof T
-  ? T[K] extends unknown[]
-    ? (...args: T[K]) => void
-    : never
-  : never;
+    ? T[K] extends unknown[]
+      ? (...args: T[K]) => void
+      : never
+    : never;
 
 export type EventTracker<T> = {
   data: () => ReadonlyArray<T>;
@@ -38,7 +38,7 @@ export type EventTracker<T> = {
 
 export const captureEvents = <T extends EventMap<T>, K extends keyof T>(
   eventEmitter: EventEmitter<T>,
-  eventName: Key<K, T>
+  eventName: Key<K, T>,
 ): EventTracker<Args<K, T>[0]> => {
   const capturedEvents: Args<K, T>[0][] = [];
 

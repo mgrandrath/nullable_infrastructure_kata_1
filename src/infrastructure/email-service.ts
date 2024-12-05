@@ -19,7 +19,7 @@ export type EmailServiceEventMap = {
       customerId: CustomerId;
       subject: string;
       body: string;
-    }
+    },
   ];
 };
 
@@ -54,13 +54,13 @@ export class EmailService implements IEmailService {
 
   constructor(
     private _configuration: EmailServiceConfiguration,
-    private _smtpClient: SmtpClient
+    private _smtpClient: SmtpClient,
   ) {}
 
   async sendEmailToCustomer(
     customerId: CustomerId,
     subject: string,
-    body: string
+    body: string,
   ) {
     // We use the injected `_smtpClient` instance without knowing if it is the
     // real one or the Nulled version. All the code in this method gets executed

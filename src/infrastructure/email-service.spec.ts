@@ -31,7 +31,7 @@ describe("EmailService", () => {
         },
         senderAddress: "unusual-spending@service.my-bank.com",
       },
-      smtpClient
+      smtpClient,
     );
 
     // Start capturing `"emailSent"` events from the `smtpClient`'s event
@@ -42,7 +42,7 @@ describe("EmailService", () => {
     await emailService.sendEmailToCustomer(
       "customer-123",
       "Important message",
-      "The message content"
+      "The message content",
     );
 
     // Calling `data` on the `EventTracker` returns an array that contains a
@@ -76,14 +76,14 @@ describe("EmailService", () => {
         },
         senderAddress: "unusual-spending@service.my-bank.com",
       },
-      smtpClient
+      smtpClient,
     );
     const events = captureEvents(emailService.events, "emailSentToCustomer");
 
     await emailService.sendEmailToCustomer(
       "customer-123",
       "Important message",
-      "The message content"
+      "The message content",
     );
 
     expect(events.data()).toEqual([
@@ -111,7 +111,7 @@ describe("EmailService", () => {
         },
         senderAddress: "irrelevant@service.my-bank.com",
       },
-      smtpClient
+      smtpClient,
     );
     const events = captureEvents(emailService.events, "emailSentToCustomer");
 
@@ -119,7 +119,7 @@ describe("EmailService", () => {
       .sendEmailToCustomer(
         "customer-123",
         "Important message",
-        "The message content"
+        "The message content",
       )
       .catch((error) => {
         if (error !== expectedError) {

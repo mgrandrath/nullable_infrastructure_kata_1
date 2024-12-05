@@ -66,7 +66,7 @@ export class SmtpClient {
       to: string;
       subject: string;
       text: string;
-    }
+    },
   ) {
     const connection = await this.connect(smtpServer);
 
@@ -89,7 +89,7 @@ export class SmtpClient {
             }
 
             resolve(info);
-          }
+          },
         );
       });
 
@@ -155,8 +155,8 @@ class NullConnection implements Connection {
     _message: string | Buffer | Readable,
     callback: (
       err: SMTPConnection.SMTPError | null,
-      info: SMTPConnection.SentMessageInfo
-    ) => void
+      info: SMTPConnection.SentMessageInfo,
+    ) => void,
   ): void {
     setImmediate(() => {
       callback(this._configuration.errorOnSend ?? null, {

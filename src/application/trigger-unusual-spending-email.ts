@@ -1,4 +1,8 @@
-import { CustomerId, detectUnusualSpending, unusualSpendingToEmailMessage } from "../domain/domain";
+import {
+  CustomerId,
+  detectUnusualSpending,
+  unusualSpendingToEmailMessage,
+} from "../domain/domain";
 import { ICalendar, IEmailService, IPaymentsApi } from "./interfaces";
 
 // This function connects domain logic and infrastructure (also known as side
@@ -15,23 +19,23 @@ export const triggerUnusualSpendingEmail = async (
   calendar: ICalendar,
   paymentsApi: IPaymentsApi,
   emailService: IEmailService,
-  customerId: CustomerId
+  customerId: CustomerId,
 ) => {
   const currentMonth = calendar.getCurrentMonthAndYear();
   const previousMonth = calendar.getPreviousMonthAndYear();
 
   const currentPayments = await paymentsApi.fetchUserPaymentsByMonth(
     customerId,
-    currentMonth
+    currentMonth,
   );
   const previousPayments = await paymentsApi.fetchUserPaymentsByMonth(
     customerId,
-    previousMonth
+    previousMonth,
   );
 
   const unusualSpending = detectUnusualSpending(
     previousPayments,
-    currentPayments
+    currentPayments,
   );
   if (!unusualSpending) {
     return;
@@ -44,6 +48,6 @@ export const triggerUnusualSpendingEmail = async (
   await emailService.sendEmailToCustomer(
     customerId,
     emailMessage.subject,
-    emailMessage.body
+    emailMessage.body,
   );
 };

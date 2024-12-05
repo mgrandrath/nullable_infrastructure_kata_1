@@ -8,7 +8,7 @@ export interface ICalendar {
 export interface IPaymentsApi {
   fetchUserPaymentsByMonth: (
     customerId: CustomerId,
-    monthInYear: MonthInYear
+    monthInYear: MonthInYear,
   ) => Promise<Payment[]>;
 }
 
@@ -16,6 +16,6 @@ export interface IEmailService {
   sendEmailToCustomer: (
     customerId: CustomerId,
     subject: string,
-    body: string
+    body: string,
   ) => Promise<void>;
 }

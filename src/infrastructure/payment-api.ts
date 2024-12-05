@@ -11,7 +11,7 @@ const ResponseSchema = z.array(
     price: z.number().positive(),
     category: z.string().min(1),
     description: z.string(),
-  })
+  }),
 );
 
 export type PaymentApiConfiguration = {
@@ -48,7 +48,7 @@ export class PaymentApi implements IPaymentsApi {
   static createNull(nullConfiguration?: NullConfiguration) {
     return new PaymentApi(
       { baseUrl: new URL("https://example.com") },
-      HttpClient.createNull(convertNullConfiguration(nullConfiguration))
+      HttpClient.createNull(convertNullConfiguration(nullConfiguration)),
     );
   }
 
@@ -59,12 +59,12 @@ export class PaymentApi implements IPaymentsApi {
 
   constructor(
     private _configuration: PaymentApiConfiguration,
-    private _httpClient: HttpClient
+    private _httpClient: HttpClient,
   ) {}
 
   async fetchUserPaymentsByMonth(
     customerId: CustomerId,
-    monthInYear: MonthInYear
+    monthInYear: MonthInYear,
   ) {
     // We use the injected `_httpClient` instance without knowing if it is the
     // real one or the Nulled version. All the code in this method gets executed
@@ -88,7 +88,7 @@ export class PaymentApi implements IPaymentsApi {
         `Failed to fetch payments for customer "${customerId}": Invalid response from server`,
         {
           cause: error,
-        }
+        },
       );
     }
   }
@@ -96,7 +96,7 @@ export class PaymentApi implements IPaymentsApi {
   private paymentsUrl(customerId: CustomerId, monthInYear: MonthInYear) {
     return new URL(
       PaymentApi.paymentsApiPath(customerId, monthInYear),
-      this._configuration.baseUrl
+      this._configuration.baseUrl,
     );
   }
 }
@@ -105,7 +105,7 @@ export class PaymentApi implements IPaymentsApi {
 // arguably one of the uglier aspects of the Nullable pattern. We hide it down
 // here out of sight. ;-)
 const convertNullConfiguration = (
-  nullConfiguration: NullConfiguration = []
+  nullConfiguration: NullConfiguration = [],
 ): HttpClientNullConfiguration => {
   const responses = Object.fromEntries(
     nullConfiguration.map(({ customerId, payments, monthInYear }) => {
@@ -115,7 +115,7 @@ const convertNullConfiguration = (
         body: JSON.stringify(payments),
       };
       return [path, response];
-    })
+    }),
   );
 
   const defaultResponse = {
