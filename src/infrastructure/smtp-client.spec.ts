@@ -43,7 +43,7 @@ describe("SmtpClient", () => {
         to: "some-receiver@example.org",
         subject: "Important message",
         text: "Hello, World!",
-      }
+      },
     );
 
     expect(testHttpServer.lastEmailReceived).toEqual({
@@ -84,7 +84,7 @@ describe("SmtpClient", () => {
         to: "some-receiver@example.org",
         subject: "Important message",
         text: "Hello, World!",
-      }
+      },
     );
 
     expect(events.data()).toEqual([
@@ -126,8 +126,8 @@ describe("SmtpClient", () => {
             to: "irrelevant@example.org",
             subject: "irrelevant",
             text: "irrelevant",
-          }
-        )
+          },
+        ),
       ).rejects.toThrow(expectedError);
     });
 
@@ -149,7 +149,7 @@ describe("SmtpClient", () => {
             to: "irrelevant@example.org",
             subject: "irrelevant",
             text: "irrelevant",
-          }
+          },
         )
         .catch((error) => {
           if (error !== expectedError) {
@@ -230,12 +230,12 @@ class TestSmtpServer {
     const address = this._smtpServer.server.address();
     if (!address) {
       throw new Error(
-        "Server is not running. Please call `start()` before calling `port()`."
+        "Server is not running. Please call `start()` before calling `port()`.",
       );
     }
     if (typeof address === "string") {
       throw new Error(
-        "Server is listening on a pipe or socket. There is no port available."
+        "Server is listening on a pipe or socket. There is no port available.",
       );
     }
 

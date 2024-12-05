@@ -1,7 +1,5 @@
 {
-  "include": [
-    "./src/**/*"
-  ],
+  "include": ["./src/**/*"],
   "compilerOptions": {
     /* Base Options: */
     "rootDir": "src",
@@ -27,6 +25,3 @@
     "types": ["vitest"]
   }
 }
-
-
-

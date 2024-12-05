@@ -19,9 +19,9 @@ describe("unusualSpendingToEmailMessage", () => {
       unusualSpendingToEmailMessage({
         monthInYear: irrelevantMonth,
         unusualSpending,
-      })
+      }),
     ).toThrow(
-      new TypeError("Cannot create an email message from an empty object")
+      new TypeError("Cannot create an email message from an empty object"),
     );
   });
 
@@ -96,7 +96,7 @@ describe("detectUnusualSpending", () => {
 
     const unusualSpending = detectUnusualSpending(
       paymentsLastMonth,
-      paymentsThisMonth
+      paymentsThisMonth,
     );
 
     expect(unusualSpending).toEqual(null);
@@ -108,7 +108,7 @@ describe("detectUnusualSpending", () => {
 
     const unusualSpending = detectUnusualSpending(
       paymentsLastMonth,
-      paymentsThisMonth
+      paymentsThisMonth,
     );
 
     expect(unusualSpending).toEqual(null);
@@ -124,7 +124,7 @@ describe("detectUnusualSpending", () => {
 
     const unusualSpending = detectUnusualSpending(
       paymentsLastMonth,
-      paymentsThisMonth
+      paymentsThisMonth,
     );
 
     expect(unusualSpending).toEqual(null);
@@ -143,7 +143,7 @@ describe("detectUnusualSpending", () => {
 
     const unusualSpending = detectUnusualSpending(
       paymentsLastMonth,
-      paymentsThisMonth
+      paymentsThisMonth,
     );
 
     expect(unusualSpending).toEqual({
@@ -162,7 +162,7 @@ describe("detectUnusualSpending", () => {
 
     const unusualSpending = detectUnusualSpending(
       paymentsLastMonth,
-      paymentsThisMonth
+      paymentsThisMonth,
     );
 
     expect(unusualSpending).toEqual({

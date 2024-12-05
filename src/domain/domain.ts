@@ -43,7 +43,7 @@ export const unusualSpendingToEmailMessage = ({
     "",
     ...categories.map(
       (category) =>
-        `* You spent $${unusualSpending[category]?.spending} on ${category}`
+        `* You spent $${unusualSpending[category]?.spending} on ${category}`,
     ),
     "",
     "Love,",
@@ -62,7 +62,7 @@ const isUnusualSpending = (spending: number, before: number) =>
 
 export const detectUnusualSpending = (
   lastMonth: Payment[],
-  thisMonth: Payment[]
+  thisMonth: Payment[],
 ): UnusualSpending => {
   const lastSpending = groupPaymentsByCategory(lastMonth);
   const currentSpending = groupPaymentsByCategory(thisMonth);
@@ -86,6 +86,6 @@ export const groupPaymentsByCategory = (payments: Payment[]) => {
       ...acc,
       [category]: (acc[category] ?? 0) + price,
     }),
-    {} as Record<string, number>
+    {} as Record<string, number>,
   );
 };

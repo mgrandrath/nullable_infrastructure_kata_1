@@ -7,8 +7,6 @@ describe("triggerUnusualSpendingEmail", () => {
   });
 });
 
-
-
 const expectedSubject = "Unusual spending of $646.38 detected!";
 const expectedBody = [
   "Hello card user!",
@@ -20,5 +18,5 @@ const expectedBody = [
   "",
   "Love,",
   "",
-  "The Credit Card Company"
+  "The Credit Card Company",
 ].join("\n");

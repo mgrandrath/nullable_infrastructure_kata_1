@@ -396,12 +396,12 @@ class TestHttpServer {
     const address = this._httpServer?.address();
     if (!address) {
       throw new Error(
-        "Server is not running. Please call `start()` before calling `port()`."
+        "Server is not running. Please call `start()` before calling `port()`.",
       );
     }
     if (typeof address === "string") {
       throw new Error(
-        "Server is listening on a pipe or socket. There is no port available."
+        "Server is listening on a pipe or socket. There is no port available.",
       );
     }
 

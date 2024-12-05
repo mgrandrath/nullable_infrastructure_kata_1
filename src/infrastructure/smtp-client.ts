@@ -34,6 +34,12 @@ type Connection = Pick<SMTPConnection, "connect" | "send" | "close">;
 type ConnectionFactory = (smtpServerAdress: SmtpServerAddress) => Connection;
 
 export class SmtpClient {
+  // Create an `EventEmitter` instance that is used for Output Tracking[^1] in
+  // tests. This implementation deviates from James Shore's original approach of
+  // creating `OutputTracker` objects. In my opinion using an `EventEmitter` is
+  // more flexible and enables other uses such as logging.
+  //
+  // [^1] https://www.jamesshore.com/v2/projects/nullables/testing-without-mocks#output-tracking
   events = new EventEmitter<SmtpClientEventMap>();
 
   // The `create` factory method creates an instance with the real side effect.
@@ -60,7 +66,7 @@ export class SmtpClient {
       to: string;
       subject: string;
       text: string;
-    }
+    },
   ) {
     const connection = await this.connect(smtpServer);
 
@@ -83,7 +89,7 @@ export class SmtpClient {
             }
 
             resolve(info);
-          }
+          },
         );
       });
 
@@ -149,8 +155,8 @@ class NullConnection implements Connection {
     _message: string | Buffer | Readable,
     callback: (
       err: SMTPConnection.SMTPError | null,
-      info: SMTPConnection.SentMessageInfo
-    ) => void
+      info: SMTPConnection.SentMessageInfo,
+    ) => void,
   ): void {
     setImmediate(() => {
       callback(this._configuration.errorOnSend ?? null, {

@@ -42,12 +42,12 @@ describe("PaymentApi", () => {
     });
     const paymentApi = new PaymentApi(
       { baseUrl: new URL("https://irrelevant.example.com") },
-      httpClient
+      httpClient,
     );
 
     const payments = await paymentApi.fetchUserPaymentsByMonth(
       customerId,
-      monthInYear
+      monthInYear,
     );
 
     expect(payments).toEqual([
@@ -79,7 +79,7 @@ describe("PaymentApi", () => {
     });
     const paymentApi = new PaymentApi(
       { baseUrl: new URL("https://api.example.com/my-api/") },
-      httpClient
+      httpClient,
     );
     const events = captureEvents(httpClient.events, "requestSent");
 
@@ -90,7 +90,7 @@ describe("PaymentApi", () => {
         request: {
           method: "GET",
           url: new URL(
-            "https://api.example.com/my-api/payments-by-month/customer-123/2024-12"
+            "https://api.example.com/my-api/payments-by-month/customer-123/2024-12",
           ),
         },
       }),
@@ -113,14 +113,14 @@ describe("PaymentApi", () => {
     });
     const paymentApi = new PaymentApi(
       { baseUrl: new URL("https://api.example.com/") },
-      httpClient
+      httpClient,
     );
 
     await expect(() =>
       paymentApi.fetchUserPaymentsByMonth("customer-123", {
         year: 2020,
         month: 2,
-      })
+      }),
     ).rejects.toThrow(PaymentApiError);
   });
 
@@ -150,12 +150,12 @@ describe("PaymentApi", () => {
     });
     const paymentApi = new PaymentApi(
       { baseUrl: new URL("https://irrelevant.example.com") },
-      httpClient
+      httpClient,
     );
 
     const payments = await paymentApi.fetchUserPaymentsByMonth(
       customerId,
-      monthInYear
+      monthInYear,
     );
 
     expect(payments).toHaveLength(1);
@@ -184,7 +184,7 @@ describe("PaymentApi", () => {
 
       const payments = await paymentApi.fetchUserPaymentsByMonth(
         "irrelevant-id",
-        { year: 2010, month: 1 }
+        { year: 2010, month: 1 },
       );
 
       expect(payments).toEqual([]);
@@ -210,7 +210,7 @@ describe("PaymentApi", () => {
 
       const payments = await paymentApi.fetchUserPaymentsByMonth(
         "customer-123",
-        { year: 2024, month: 9 }
+        { year: 2024, month: 9 },
       );
 
       expect(payments).toEqual([
