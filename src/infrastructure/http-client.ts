@@ -1,4 +1,4 @@
-import EventEmitter from "node:events";
+import { EventEmitter, Event } from "./event-emitter";
 
 export type HttpClientRequest = {
   method:
@@ -24,25 +24,28 @@ export type HttpClientResponse = {
 
 export type NullConfiguration = Record<string, Partial<HttpClientResponse>>;
 
-// The event map defines the events that the `HttpClient` emits. In this case it
-// emits `"requestSent"` events with `request` and `response` properties. The
-// reason the event schema is wrapped in an array is that the native Node.js
-// event emitters allow emitting an arbitrary number of arguments for any event
-// type.
-export type HttpClientEventMap = {
-  requestSent: [{ request: HttpClientRequest; response: HttpClientResponse }];
-};
+export type RequestSentEvent = Event<
+  "requestSent",
+  { request: HttpClientRequest; response: HttpClientResponse }
+>;
+
+const requestSentEvent = (
+  payload: RequestSentEvent["payload"],
+): RequestSentEvent => ({
+  type: "requestSent",
+  payload,
+});
 
 type Fetch = typeof globalThis.fetch;
 
 export class HttpClient {
   // Create an `EventEmitter` instance that is used for Output Tracking[^1] in
   // tests. This implementation deviates from James Shore's original approach of
-  // creating `OutputTracker` objects. In my opinion using an `EventEmitter` is
-  // more flexible and enables other uses such as logging.
+  // creating `OutputTracker` objects. In my personal opinion using an
+  // `EventEmitter` is more flexible and enables other uses such as logging.
   //
   // [^1] https://www.jamesshore.com/v2/projects/nullables/testing-without-mocks#output-tracking
-  events = new EventEmitter<HttpClientEventMap>();
+  eventsNew = new EventEmitter();
 
   // The `create` factory method creates an instance with the real side effect.
   // In this case this is the global `fetch` function for sending HTTP requests.
@@ -78,7 +81,7 @@ export class HttpClient {
     // We emit an event that the HTTP request has been sent. We deliberately
     // call `emit` *after* the side effect so that it is not emitted when
     // sending the request failed with an error.
-    this.events.emit("requestSent", { request, response });
+    this.eventsNew.emit(requestSentEvent({ request, response }));
 
     return response;
   }

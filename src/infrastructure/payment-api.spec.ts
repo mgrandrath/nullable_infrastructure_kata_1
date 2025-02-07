@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { HttpClient } from "./http-client";
 import { CustomerId, MonthInYear } from "../domain/domain";
-import { captureEvents, createPayment } from "../spec-helpers";
+import { captureEventsNew, createPayment } from "../spec-helpers";
 import { PaymentApi, PaymentApiError } from "./payment-api";
 
 describe("PaymentApi", () => {
@@ -81,19 +81,22 @@ describe("PaymentApi", () => {
       { baseUrl: new URL("https://api.example.com/my-api/") },
       httpClient,
     );
-    const events = captureEvents(httpClient.events, "requestSent");
+    const events = captureEventsNew(httpClient.eventsNew);
 
     await paymentApi.fetchUserPaymentsByMonth(customerId, monthInYear);
 
     expect(events.data()).toEqual([
-      expect.objectContaining({
-        request: {
-          method: "GET",
-          url: new URL(
-            "https://api.example.com/my-api/payments-by-month/customer-123/2024-12",
-          ),
-        },
-      }),
+      {
+        type: "requestSent",
+        payload: expect.objectContaining({
+          request: {
+            method: "GET",
+            url: new URL(
+              "https://api.example.com/my-api/payments-by-month/customer-123/2024-12",
+            ),
+          },
+        }),
+      },
     ]);
   });
 

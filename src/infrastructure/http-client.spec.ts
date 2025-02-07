@@ -10,7 +10,7 @@ import {
 } from "vitest";
 import express, { Express } from "express";
 import { HttpClient } from "./http-client";
-import { captureEvents } from "../spec-helpers";
+import { captureEventsNew } from "../spec-helpers";
 
 describe("HttpClient", () => {
   // We use a real HTTP server in our tests in order to verify the actual core
@@ -227,7 +227,7 @@ describe("HttpClient", () => {
           body: "Configured response for /some/path",
         },
       });
-      const events = captureEvents(httpClient.events, "requestSent");
+      const events = captureEventsNew(httpClient.eventsNew);
 
       await httpClient.sendRequest({
         method: "PUT",
@@ -244,31 +244,37 @@ describe("HttpClient", () => {
 
       expect(events.data()).toEqual([
         {
-          request: {
-            method: "PUT",
-            url: new URL("https://example.com/some/path"),
-            headers: {
-              "x-my-request-header": "My header value",
+          type: "requestSent",
+          payload: {
+            request: {
+              method: "PUT",
+              url: new URL("https://example.com/some/path"),
+              headers: {
+                "x-my-request-header": "My header value",
+              },
+              body: "My request body",
             },
-            body: "My request body",
-          },
-          response: {
-            status: 201,
-            headers: expect.objectContaining({
-              "x-my-response-header": "My header value",
-            }),
-            body: "Configured response for /some/path",
+            response: {
+              status: 201,
+              headers: expect.objectContaining({
+                "x-my-response-header": "My header value",
+              }),
+              body: "Configured response for /some/path",
+            },
           },
         },
         {
-          request: {
-            method: "DELETE",
-            url: new URL("https://example.com/some/other/path"),
-          },
-          response: {
-            status: 404,
-            headers: expect.any(Object),
-            body: "Default null response",
+          type: "requestSent",
+          payload: {
+            request: {
+              method: "DELETE",
+              url: new URL("https://example.com/some/other/path"),
+            },
+            response: {
+              status: 404,
+              headers: expect.any(Object),
+              body: "Default null response",
+            },
           },
         },
       ]);
@@ -278,7 +284,7 @@ describe("HttpClient", () => {
       const expectedError = new Error("Fetch failed");
       const failingFetch = vi.fn().mockRejectedValue(expectedError);
       const httpClient = new HttpClient(failingFetch);
-      const events = captureEvents(httpClient.events, "requestSent");
+      const events = captureEventsNew(httpClient.eventsNew);
 
       await httpClient
         .sendRequest({
