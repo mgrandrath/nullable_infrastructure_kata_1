@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { SmtpClient } from "./smtp-client";
 import { EmailService } from "./email-service";
-import { captureEvents, captureEventsNew } from "../spec-helpers";
+import { captureEventsNew } from "../spec-helpers";
 
 describe("EmailService", () => {
   it("should send an email to a given customer", async () => {
@@ -37,7 +37,7 @@ describe("EmailService", () => {
     // Start capturing `"emailSent"` events from the `smtpClient`'s event
     // emitter. We use them to detect which emails were sent out by the
     // `smtpClient` during the test.
-    const events = captureEvents(smtpClient.events, "emailSent");
+    const events = captureEventsNew(smtpClient.eventsNew);
 
     await emailService.sendEmailToCustomer(
       "customer-123",
@@ -50,15 +50,18 @@ describe("EmailService", () => {
     // the `smtp-client` module alongside the `SmtpClient` class.
     expect(events.data()).toEqual([
       {
-        smtpServer: {
-          host: "smtp.my-bank.com",
-          port: 1234,
-        },
-        email: {
-          from: "unusual-spending@service.my-bank.com",
-          to: "customer-123@customer.my-bank.com",
-          subject: "Important message",
-          text: "The message content",
+        type: "emailSent",
+        payload: {
+          smtpServer: {
+            host: "smtp.my-bank.com",
+            port: 1234,
+          },
+          email: {
+            from: "unusual-spending@service.my-bank.com",
+            to: "customer-123@customer.my-bank.com",
+            subject: "Important message",
+            text: "The message content",
+          },
         },
       },
     ]);

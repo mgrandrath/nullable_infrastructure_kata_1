@@ -1,7 +1,7 @@
-import EventEmitter from "events";
 import MailComposer from "nodemailer/lib/mail-composer";
 import SMTPConnection, { SMTPError } from "nodemailer/lib/smtp-connection";
 import { Readable } from "stream";
+import { EventEmitter, Event } from "./event-emitter";
 
 export type Email = {
   from: string;
@@ -19,14 +19,17 @@ export type NullConfiguration = {
   errorOnSend?: SMTPError;
 };
 
-// The event map defines the events that the `SmtpClient` emits. In this case it
-// emits `"emailSent"` events with `smtpServer` and `email` properties. The
-// reason the event schema is wrapped in an array is that the native Node.js
-// event emitters allow emitting an arbitrary number of arguments for any event
-// type.
-export type SmtpClientEventMap = {
-  emailSent: [{ smtpServer: SmtpServerAddress; email: Email }];
-};
+export type EmailSentEvent = Event<
+  "emailSent",
+  { smtpServer: SmtpServerAddress; email: Email }
+>;
+
+const emailSentEvent = (
+  payload: EmailSentEvent["payload"],
+): EmailSentEvent => ({
+  type: "emailSent",
+  payload,
+});
 
 // We create a subset of the third party `SMTPConnection` interface that we
 // actually use in our implementation. This subset can grow over time as needed.
@@ -36,11 +39,11 @@ type ConnectionFactory = (smtpServerAdress: SmtpServerAddress) => Connection;
 export class SmtpClient {
   // Create an `EventEmitter` instance that is used for Output Tracking[^1] in
   // tests. This implementation deviates from James Shore's original approach of
-  // creating `OutputTracker` objects. In my opinion using an `EventEmitter` is
-  // more flexible and enables other uses such as logging.
+  // creating `OutputTracker` objects. In my personal opinion using an
+  // `EventEmitter` is more flexible and enables other uses such as logging.
   //
   // [^1] https://www.jamesshore.com/v2/projects/nullables/testing-without-mocks#output-tracking
-  events = new EventEmitter<SmtpClientEventMap>();
+  eventsNew = new EventEmitter();
 
   // The `create` factory method creates an instance with the real side effect.
   // In this case this is creating `SMTPConnection` instances provided by the
@@ -96,7 +99,7 @@ export class SmtpClient {
       // We emit an event that the email has been sent. We deliberately call
       // `emit` *after* the side effect so that it is not emitted when sending
       // the request failed with an error.
-      this.events.emit("emailSent", { smtpServer, email });
+      this.eventsNew.emit(emailSentEvent({ smtpServer, email }));
     } finally {
       connection.close();
     }

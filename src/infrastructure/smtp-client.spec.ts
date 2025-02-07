@@ -2,7 +2,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { SMTPServer } from "smtp-server";
 import { simpleParser as parseEmailStream } from "mailparser";
 import { SmtpClient } from "./smtp-client";
-import { captureEvents } from "../spec-helpers";
+import { captureEventsNew } from "../spec-helpers";
 
 describe("SmtpClient", () => {
   // We use a real SMTP server in our tests in order to verify the actual core
@@ -72,7 +72,7 @@ describe("SmtpClient", () => {
     // `captureEvents` is a helper function that we use inside tests to capture
     // emitted events and convert them into an array. This makes it easier write
     // assertions for the expected events.
-    const events = captureEvents(smtpClient.events, "emailSent");
+    const events = captureEventsNew(smtpClient.eventsNew);
 
     await smtpClient.sendEmail(
       {
@@ -89,15 +89,18 @@ describe("SmtpClient", () => {
 
     expect(events.data()).toEqual([
       {
-        smtpServer: {
-          host: "localhost",
-          port: testHttpServer.port(),
-        },
-        email: {
-          from: "some-sender@example.com",
-          to: "some-receiver@example.org",
-          subject: "Important message",
-          text: "Hello, World!",
+        type: "emailSent",
+        payload: {
+          smtpServer: {
+            host: "localhost",
+            port: testHttpServer.port(),
+          },
+          email: {
+            from: "some-sender@example.com",
+            to: "some-receiver@example.org",
+            subject: "Important message",
+            text: "Hello, World!",
+          },
         },
       },
     ]);
@@ -136,7 +139,7 @@ describe("SmtpClient", () => {
       const smtpClient = SmtpClient.createNull({
         errorOnSend: expectedError,
       });
-      const events = captureEvents(smtpClient.events, "emailSent");
+      const events = captureEventsNew(smtpClient.eventsNew);
 
       await smtpClient
         .sendEmail(
