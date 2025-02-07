@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { SmtpClient } from "./smtp-client";
 import { EmailService } from "./email-service";
-import { captureEvents } from "../spec-helpers";
+import { captureEvents, captureEventsNew } from "../spec-helpers";
 
 describe("EmailService", () => {
   it("should send an email to a given customer", async () => {
@@ -78,7 +78,7 @@ describe("EmailService", () => {
       },
       smtpClient,
     );
-    const events = captureEvents(emailService.events, "emailSentToCustomer");
+    const events = captureEventsNew(emailService.events);
 
     await emailService.sendEmailToCustomer(
       "customer-123",
@@ -88,9 +88,12 @@ describe("EmailService", () => {
 
     expect(events.data()).toEqual([
       {
-        customerId: "customer-123",
-        subject: "Important message",
-        body: "The message content",
+        type: "emailSentToCustomer",
+        payload: {
+          customerId: "customer-123",
+          subject: "Important message",
+          body: "The message content",
+        },
       },
     ]);
   });
@@ -113,7 +116,7 @@ describe("EmailService", () => {
       },
       smtpClient,
     );
-    const events = captureEvents(emailService.events, "emailSentToCustomer");
+    const events = captureEventsNew(emailService.events);
 
     await emailService
       .sendEmailToCustomer(

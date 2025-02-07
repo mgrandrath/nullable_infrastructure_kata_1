@@ -1,5 +1,6 @@
-import EventEmitter from "events";
+import NodeJsEventEmitter from "events";
 import { Payment } from "./domain/domain";
+import { EventEmitter, Event } from "./infrastructure/event-emitter";
 
 const factory =
   <T extends object>(defaults: T) =>
@@ -36,8 +37,12 @@ export type EventTracker<T> = {
   data: () => ReadonlyArray<T>;
 };
 
+export type EventTrackerNew = {
+  data: () => ReadonlyArray<Event>;
+};
+
 export const captureEvents = <T extends EventMap<T>, K extends keyof T>(
-  eventEmitter: EventEmitter<T>,
+  eventEmitter: NodeJsEventEmitter<T>,
   eventName: Key<K, T>,
 ): EventTracker<Args<K, T>[0]> => {
   const capturedEvents: Args<K, T>[0][] = [];
@@ -45,6 +50,28 @@ export const captureEvents = <T extends EventMap<T>, K extends keyof T>(
   eventEmitter.on(eventName, ((...args: Args<K, T>) => {
     capturedEvents.push(args[0]);
   }) as Listener<K, T, (...args: any[]) => void>);
+
+  return {
+    data: () => {
+      const result = [...capturedEvents];
+
+      // Setting the `length` property of an aray to `0` effectively empties the
+      // array.
+      capturedEvents.length = 0;
+
+      return result;
+    },
+  };
+};
+
+export const captureEventsNew = (
+  eventEmitter: EventEmitter,
+): EventTrackerNew => {
+  const capturedEvents: Event[] = [];
+
+  eventEmitter.addListener((event) => {
+    capturedEvents.push(event);
+  });
 
   return {
     data: () => {

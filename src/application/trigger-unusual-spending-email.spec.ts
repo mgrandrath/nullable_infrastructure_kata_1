@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { captureEvents, createPayment } from "../spec-helpers";
+import { captureEventsNew, createPayment } from "../spec-helpers";
 import { Calendar } from "../infrastructure/calendar";
 import { PaymentApi } from "../infrastructure/payment-api";
 import { EmailService } from "../infrastructure/email-service";
@@ -55,10 +55,7 @@ describe("triggerUnusualSpendingEmail", () => {
       },
     ]);
     const emailService = EmailService.createNull();
-    const sentEmails = captureEvents(
-      emailService.events,
-      "emailSentToCustomer",
-    );
+    const sentEmails = captureEventsNew(emailService.events);
 
     await triggerUnusualSpendingEmail(
       calendar,
@@ -69,20 +66,23 @@ describe("triggerUnusualSpendingEmail", () => {
 
     expect(sentEmails.data()).toEqual([
       {
-        customerId,
-        subject: "Unusual spending of $646.38 detected!",
-        body: [
-          "Hello card user!",
-          "",
-          "We have detected unusually high spending on your card in these categories in 2024-11:",
-          "",
-          "* You spent $445.89 on electronics",
-          "* You spent $200.49 on beauty",
-          "",
-          "Love,",
-          "",
-          "The Credit Card Company",
-        ].join("\n"),
+        type: "emailSentToCustomer",
+        payload: {
+          customerId,
+          subject: "Unusual spending of $646.38 detected!",
+          body: [
+            "Hello card user!",
+            "",
+            "We have detected unusually high spending on your card in these categories in 2024-11:",
+            "",
+            "* You spent $445.89 on electronics",
+            "* You spent $200.49 on beauty",
+            "",
+            "Love,",
+            "",
+            "The Credit Card Company",
+          ].join("\n"),
+        },
       },
     ]);
   });
@@ -117,10 +117,7 @@ describe("triggerUnusualSpendingEmail", () => {
       },
     ]);
     const emailService = EmailService.createNull();
-    const sentEmails = captureEvents(
-      emailService.events,
-      "emailSentToCustomer",
-    );
+    const sentEmails = captureEventsNew(emailService.events);
 
     await triggerUnusualSpendingEmail(
       calendar,
