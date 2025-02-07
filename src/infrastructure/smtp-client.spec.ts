@@ -2,7 +2,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { SMTPServer } from "smtp-server";
 import { simpleParser as parseEmailStream } from "mailparser";
 import { SmtpClient } from "./smtp-client";
-import { captureEventsNew } from "../spec-helpers";
+import { captureEvents } from "../spec-helpers";
 
 describe("SmtpClient", () => {
   // We use a real SMTP server in our tests in order to verify the actual core
@@ -72,7 +72,7 @@ describe("SmtpClient", () => {
     // `captureEvents` is a helper function that we use inside tests to capture
     // emitted events and convert them into an array. This makes it easier write
     // assertions for the expected events.
-    const events = captureEventsNew(smtpClient.eventsNew);
+    const events = captureEvents(smtpClient.events);
 
     await smtpClient.sendEmail(
       {
@@ -139,7 +139,7 @@ describe("SmtpClient", () => {
       const smtpClient = SmtpClient.createNull({
         errorOnSend: expectedError,
       });
-      const events = captureEventsNew(smtpClient.eventsNew);
+      const events = captureEvents(smtpClient.events);
 
       await smtpClient
         .sendEmail(

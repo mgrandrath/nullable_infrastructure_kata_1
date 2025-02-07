@@ -1,4 +1,3 @@
-import NodeJsEventEmitter from "events";
 import { Payment } from "./domain/domain";
 import { EventEmitter, Event } from "./infrastructure/event-emitter";
 
@@ -15,58 +14,11 @@ export const createPayment = factory<Payment>({
   description: "An example payment",
 });
 
-// Copy types from @types/node/events.d.ts that are unfortunately not exported
-type DefaultEventMap = [never];
-type EventMap<T> = Record<keyof T, any[]> | DefaultEventMap;
-type Key<K, T> = T extends DefaultEventMap ? string | symbol : K | keyof T;
-type AnyRest = [...args: any[]];
-type Args<K, T> = T extends DefaultEventMap
-  ? AnyRest
-  : K extends keyof T
-    ? T[K]
-    : never;
-type Listener<K, T, F> = T extends DefaultEventMap
-  ? F
-  : K extends keyof T
-    ? T[K] extends unknown[]
-      ? (...args: T[K]) => void
-      : never
-    : never;
-
-export type EventTracker<T> = {
-  data: () => ReadonlyArray<T>;
-};
-
-export type EventTrackerNew = {
+export type EventTracker = {
   data: () => ReadonlyArray<Event>;
 };
 
-export const captureEvents = <T extends EventMap<T>, K extends keyof T>(
-  eventEmitter: NodeJsEventEmitter<T>,
-  eventName: Key<K, T>,
-): EventTracker<Args<K, T>[0]> => {
-  const capturedEvents: Args<K, T>[0][] = [];
-
-  eventEmitter.on(eventName, ((...args: Args<K, T>) => {
-    capturedEvents.push(args[0]);
-  }) as Listener<K, T, (...args: any[]) => void>);
-
-  return {
-    data: () => {
-      const result = [...capturedEvents];
-
-      // Setting the `length` property of an aray to `0` effectively empties the
-      // array.
-      capturedEvents.length = 0;
-
-      return result;
-    },
-  };
-};
-
-export const captureEventsNew = (
-  eventEmitter: EventEmitter,
-): EventTrackerNew => {
+export const captureEvents = (eventEmitter: EventEmitter): EventTracker => {
   const capturedEvents: Event[] = [];
 
   eventEmitter.addListener((event) => {

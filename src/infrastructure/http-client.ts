@@ -45,7 +45,7 @@ export class HttpClient {
   // `EventEmitter` is more flexible and enables other uses such as logging.
   //
   // [^1] https://www.jamesshore.com/v2/projects/nullables/testing-without-mocks#output-tracking
-  eventsNew = new EventEmitter();
+  events = new EventEmitter();
 
   // The `create` factory method creates an instance with the real side effect.
   // In this case this is the global `fetch` function for sending HTTP requests.
@@ -81,7 +81,7 @@ export class HttpClient {
     // We emit an event that the HTTP request has been sent. We deliberately
     // call `emit` *after* the side effect so that it is not emitted when
     // sending the request failed with an error.
-    this.eventsNew.emit(requestSentEvent({ request, response }));
+    this.events.emit(requestSentEvent({ request, response }));
 
     return response;
   }

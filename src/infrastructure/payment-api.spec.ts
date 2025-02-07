@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { HttpClient } from "./http-client";
 import { CustomerId, MonthInYear } from "../domain/domain";
-import { captureEventsNew, createPayment } from "../spec-helpers";
+import { captureEvents, createPayment } from "../spec-helpers";
 import { PaymentApi, PaymentApiError } from "./payment-api";
 
 describe("PaymentApi", () => {
@@ -81,7 +81,7 @@ describe("PaymentApi", () => {
       { baseUrl: new URL("https://api.example.com/my-api/") },
       httpClient,
     );
-    const events = captureEventsNew(httpClient.eventsNew);
+    const events = captureEvents(httpClient.events);
 
     await paymentApi.fetchUserPaymentsByMonth(customerId, monthInYear);
 

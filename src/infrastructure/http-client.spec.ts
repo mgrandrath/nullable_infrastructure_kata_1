@@ -10,7 +10,7 @@ import {
 } from "vitest";
 import express, { Express } from "express";
 import { HttpClient } from "./http-client";
-import { captureEventsNew } from "../spec-helpers";
+import { captureEvents } from "../spec-helpers";
 
 describe("HttpClient", () => {
   // We use a real HTTP server in our tests in order to verify the actual core
@@ -227,7 +227,7 @@ describe("HttpClient", () => {
           body: "Configured response for /some/path",
         },
       });
-      const events = captureEventsNew(httpClient.eventsNew);
+      const events = captureEvents(httpClient.events);
 
       await httpClient.sendRequest({
         method: "PUT",
@@ -284,7 +284,7 @@ describe("HttpClient", () => {
       const expectedError = new Error("Fetch failed");
       const failingFetch = vi.fn().mockRejectedValue(expectedError);
       const httpClient = new HttpClient(failingFetch);
-      const events = captureEventsNew(httpClient.eventsNew);
+      const events = captureEvents(httpClient.events);
 
       await httpClient
         .sendRequest({

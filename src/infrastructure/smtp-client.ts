@@ -43,7 +43,7 @@ export class SmtpClient {
   // `EventEmitter` is more flexible and enables other uses such as logging.
   //
   // [^1] https://www.jamesshore.com/v2/projects/nullables/testing-without-mocks#output-tracking
-  eventsNew = new EventEmitter();
+  events = new EventEmitter();
 
   // The `create` factory method creates an instance with the real side effect.
   // In this case this is creating `SMTPConnection` instances provided by the
@@ -99,7 +99,7 @@ export class SmtpClient {
       // We emit an event that the email has been sent. We deliberately call
       // `emit` *after* the side effect so that it is not emitted when sending
       // the request failed with an error.
-      this.eventsNew.emit(emailSentEvent({ smtpServer, email }));
+      this.events.emit(emailSentEvent({ smtpServer, email }));
     } finally {
       connection.close();
     }

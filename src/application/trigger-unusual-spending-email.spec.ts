@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { captureEventsNew, createPayment } from "../spec-helpers";
+import { captureEvents, createPayment } from "../spec-helpers";
 import { Calendar } from "../infrastructure/calendar";
 import { PaymentApi } from "../infrastructure/payment-api";
 import { EmailService } from "../infrastructure/email-service";
@@ -55,7 +55,7 @@ describe("triggerUnusualSpendingEmail", () => {
       },
     ]);
     const emailService = EmailService.createNull();
-    const sentEmails = captureEventsNew(emailService.events);
+    const sentEmails = captureEvents(emailService.events);
 
     await triggerUnusualSpendingEmail(
       calendar,
@@ -117,7 +117,7 @@ describe("triggerUnusualSpendingEmail", () => {
       },
     ]);
     const emailService = EmailService.createNull();
-    const sentEmails = captureEventsNew(emailService.events);
+    const sentEmails = captureEvents(emailService.events);
 
     await triggerUnusualSpendingEmail(
       calendar,

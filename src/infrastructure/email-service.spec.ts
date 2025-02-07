@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { SmtpClient } from "./smtp-client";
 import { EmailService } from "./email-service";
-import { captureEventsNew } from "../spec-helpers";
+import { captureEvents } from "../spec-helpers";
 
 describe("EmailService", () => {
   it("should send an email to a given customer", async () => {
@@ -37,7 +37,7 @@ describe("EmailService", () => {
     // Start capturing `"emailSent"` events from the `smtpClient`'s event
     // emitter. We use them to detect which emails were sent out by the
     // `smtpClient` during the test.
-    const events = captureEventsNew(smtpClient.eventsNew);
+    const events = captureEvents(smtpClient.events);
 
     await emailService.sendEmailToCustomer(
       "customer-123",
@@ -81,7 +81,7 @@ describe("EmailService", () => {
       },
       smtpClient,
     );
-    const events = captureEventsNew(emailService.events);
+    const events = captureEvents(emailService.events);
 
     await emailService.sendEmailToCustomer(
       "customer-123",
@@ -119,7 +119,7 @@ describe("EmailService", () => {
       },
       smtpClient,
     );
-    const events = captureEventsNew(emailService.events);
+    const events = captureEvents(emailService.events);
 
     await emailService
       .sendEmailToCustomer(
