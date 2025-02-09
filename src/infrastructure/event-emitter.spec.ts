@@ -5,11 +5,11 @@ describe("EventEmitter", () => {
   it("should emit and listen to events", () => {
     const listenerOne = vi.fn();
     const listenerTwo = vi.fn();
-    const observable = new EventEmitter();
-    observable.addListener(listenerOne);
-    observable.addListener(listenerTwo);
+    const eventEmitter = new EventEmitter();
+    eventEmitter.addListener(listenerOne);
+    eventEmitter.addListener(listenerTwo);
 
-    observable.emit({
+    eventEmitter.emit({
       type: "my-event",
       payload: { data: "hello" },
     });
@@ -26,11 +26,11 @@ describe("EventEmitter", () => {
 
   it("should not add a listener twice", () => {
     const listener = vi.fn();
-    const observable = new EventEmitter();
-    observable.addListener(listener);
-    observable.addListener(listener);
+    const eventEmitter = new EventEmitter();
+    eventEmitter.addListener(listener);
+    eventEmitter.addListener(listener);
 
-    observable.emit({
+    eventEmitter.emit({
       type: "my-event",
       payload: { data: "hello" },
     });
@@ -40,12 +40,12 @@ describe("EventEmitter", () => {
 
   it("should remove listener", () => {
     const listener = vi.fn();
-    const observable = new EventEmitter();
-    observable.addListener(listener);
+    const eventEmitter = new EventEmitter();
+    eventEmitter.addListener(listener);
 
-    observable.removeListener(listener);
+    eventEmitter.removeListener(listener);
 
-    observable.emit({
+    eventEmitter.emit({
       type: "my-event",
       payload: { data: "hello" },
     });
