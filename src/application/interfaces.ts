@@ -5,7 +5,7 @@ export interface ICalendar {
   getPreviousMonthAndYear: () => MonthInYear;
 }
 
-export interface IPaymentsApi {
+export interface IPaymentApi {
   fetchUserPaymentsByMonth: (
     customerId: CustomerId,
     monthInYear: MonthInYear,

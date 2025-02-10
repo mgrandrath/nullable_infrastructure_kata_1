@@ -4,7 +4,7 @@ import {
   HttpClient,
   NullConfiguration as HttpClientNullConfiguration,
 } from "./http-client";
-import { IPaymentsApi } from "../application/interfaces";
+import { IPaymentApi } from "../application/interfaces";
 
 const ResponseSchema = z.array(
   z.object({
@@ -26,7 +26,7 @@ export type NullConfiguration = {
 
 export class PaymentApiError extends Error {}
 
-export class PaymentApi implements IPaymentsApi {
+export class PaymentApi implements IPaymentApi {
   // The `create` factory method creates an instance with the real side effect.
   // In this case a real `HttpClient` instance.
   static create(configuration: PaymentApiConfiguration) {

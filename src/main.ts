@@ -1,7 +1,4 @@
-import { Calendar } from "./infrastructure/calendar";
-import { EmailService } from "./infrastructure/email-service";
-import { PaymentApi } from "./infrastructure/payment-api";
-import { triggerUnusualSpendingEmail } from "./application/trigger-unusual-spending-email";
+import { Application } from "./application/application";
 
 const API_URL = "http://localhost:3000/";
 const EMAIL_SENDER_ADDRESS = "unusual-spending@my-bank.example.com";
@@ -10,14 +7,14 @@ const SMTP_PORT = 2525;
 
 const customerId = "customer-123";
 
-const calendar = Calendar.create();
-const paymentApi = PaymentApi.create({ baseUrl: new URL(API_URL) });
-const emailService = EmailService.create({
+const application = Application.create({
+  baseUrl: new URL(API_URL),
   senderAddress: EMAIL_SENDER_ADDRESS,
   smtpServer: { host: SMTP_HOST, port: SMTP_PORT },
 });
 
-triggerUnusualSpendingEmail(calendar, paymentApi, emailService, customerId)
+application
+  .triggerUnusualSpendingEmail(customerId)
   .then(() => {
     console.log("Check successful");
   })
